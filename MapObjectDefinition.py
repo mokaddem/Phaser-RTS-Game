@@ -3,6 +3,9 @@
 import configparser
 from pprint import pprint
 
+cfg = configparser.ConfigParser()
+cfg.read('config.cfg')
+
 class MapObject:
     def __init__(self, height=1, width=1, name="MapObject"):
         self.height = height #y
@@ -34,15 +37,17 @@ class DestructableMapObject(MapObject):
 #################
 
 class Structure(DestructableMapObject):
-    def __init__(self, height=1, width=1, name="Structure", lifePoint=100)):
+    def __init__(self, height=1, width=1, name="Structure", lifePoint=100):
         DestructableMapObject.__init__(self, height, width, name, lifePoint)
 
 class Core(Structure):
     def __init__(self, name="Core"):
-        self.height = cfg.getint('structure.core', 'height')
-        self.width = cfg.getint('structure.core', 'width')
-        self.lifePoint = cfg.getint('structure.core', 'lifePoint')
+        height = cfg.getint('structure.core', 'height')
+        width = cfg.getint('structure.core', 'width')
+        lifePoint = cfg.getint('structure.core', 'lifePoint')
         Structure.__init__(self, height, width, name, lifePoint)
+        
+        self.setTexture('green')
 
 
 ############
@@ -50,14 +55,14 @@ class Core(Structure):
 ############
 
 class Unit(DestructableMapObject):
-    def __init__(self, height=1, width=1, name="Unit", lifePoint=10)):
+    def __init__(self, height=1, width=1, name="Unit", lifePoint=10):
         DestructableMapObject.__init__(self, height, width, name, lifePoint)
 
 class meleUnit(Unit):
     def __init__(self, name="meleUnit"):
-        self.height = cfg.getint('unit.meleUnit', 'height')
-        self.width = cfg.getint('unit.meleUnit', 'width')
-        self.lifePoint = cfg.getint('unit.meleUnit', 'lifePoint')
+        height = cfg.getint('unit.meleUnit', 'height')
+        width = cfg.getint('unit.meleUnit', 'width')
+        lifePoint = cfg.getint('unit.meleUnit', 'lifePoint')
         self.dammage = cfg.getint('unit.meleUnit', 'dammage')
         self.range = cfg.getint('unit.meleUnit', 'range')
 
@@ -65,9 +70,9 @@ class meleUnit(Unit):
 
 class rangedUnit(Unit):
     def __init__(self, name="rangedUnit"):
-        self.height = cfg.getint('unit.rangedUnit', 'height')
-        self.width = cfg.getint('unit.rangedUnit', 'width')
-        self.lifePoint = cfg.getint('unit.rangedUnit', 'lifePoint')
+        height = cfg.getint('unit.rangedUnit', 'height')
+        width = cfg.getint('unit.rangedUnit', 'width')
+        lifePoint = cfg.getint('unit.rangedUnit', 'lifePoint')
         self.dammage = cfg.getint('unit.rangedUnit', 'dammage')
         self.range = cfg.getint('unit.rangedUnit', 'range')
 
