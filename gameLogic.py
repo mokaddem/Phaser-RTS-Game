@@ -38,31 +38,38 @@ class mainGamelogicThread(threading.Thread):
         self.all_requests = all_requests
         self.all_updates = all_updates
 
+        self.allUnits = []
+        self.allStructures = []
+
     def run(self):
         print("Starting main game logic thread", time.ctime(time.time()))
-        start_main_loop(self, self.name, self.the_map, self.all_requests, self.all_updates)
+        self.start_main_loop()
         print("Exiting main game logic thread", time.ctime(time.time()))
 
-def start_main_loop(thread, threadName, the_map, all_requests, all_updates):
-    core1 = MapObjectDefinition.Core()
-    the_map.placeObject(core1, 2, 10)
-    core2 = MapObjectDefinition.Core()
-    the_map.placeObject(core2, 97, 10)
+    def start_main_loop(self):
+        core1 = MapObjectDefinition.Core()
+        self.the_map.placeObject(core1, 2, 10)
+        core2 = MapObjectDefinition.Core()
+        self.the_map.placeObject(core2, 97, 10)
+    
+        while True:
+            time.sleep(timeToWaitForRefresh)
+            #process request
+            #execute main game logic
+            while len(self.all_requests) > 0:
+                request = self.all_requests.pop()
+                if request.isUnitRequest():
+                    x = request.x
+                    y = request.y
+                    if request.theType == 'meleUnit':
+                        unit = MapObjectDefinition.meleUnit()
+                        self.the_map.placeObject(unit, x, y)
+                        print('MeleUnit created and placed')
+                    elif request.theType == 'rangedUnit':
+                        unit = MapObjectDefinition.rangedUnit()
+                        self.the_map.placeObject(unit, x, y)
+                executeGameLogic()
+    
+    def executeGameLogic(self):
 
-    while True:
-        time.sleep(timeToWaitForRefresh)
-        #process request
-        #execute main game logic
-        while len(all_requests) > 0:
-            request = all_requests.pop()
-            if request.isUnitRequest():
-                x = request.x
-                y = request.y
-                if request.theType == 'meleUnit':
-                    unit = MapObjectDefinition.meleUnit()
-                    the_map.placeObject(unit, x, y)
-                    print('MeleUnit created and placed')
-                elif request.theType == 'rangedUnit':
-                    unit = MapObjectDefinition.rangedUnit()
-                    the_map.placeObject(unit, x, y)
 

@@ -49,29 +49,13 @@ def clickCell():
 
     ThePlayerRequest = PlayerRequest('unit', 'meleUnit', x, y)
     all_requests.append(ThePlayerRequest)
-    #unit = MapObjectDefinition.meleUnit()
-    #the_map.placeObject(unit, x, y)
 
-    #to_return = []
-    #to_return.append(modif_obj)
-    #return json.dumps(to_return)
-    
-    #modif_obj = the_map.getJsonCell(x, y)
-    #all_updates.append(modif_obj)
     return json.dumps({})
 
 
 def main():
     global the_map
     the_map = MapDefinition.Map(all_updates)
-
-    #mapState1 = the_map.getMapState()
-    #core1 = MapObjectDefinition.Core()
-    #the_map.placeObject(core1, 2, 10)
-    #core2 = MapObjectDefinition.Core()
-    #the_map.placeObject(core2, 97, 10)
-    #mapState = the_map.getMapState()
-    #print(mapState)
 
     mainGamelogic = mainGamelogicThread("gameLogic", the_map, all_requests, all_updates)
     mainGamelogic.start()
