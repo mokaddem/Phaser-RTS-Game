@@ -68,8 +68,7 @@ class mainGamelogicThread(threading.Thread):
                     elif request.theType == 'rangedUnit':
                         unit = MapObjectDefinition.rangedUnit()
                         self.the_map.placeObject(unit, x, y)
-                executeGameLogic()
+                self.executeGameLogic()
     
     def executeGameLogic(self):
-
-
+        pass
