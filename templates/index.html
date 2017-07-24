@@ -10,6 +10,11 @@
             background: darkgrey;
         }
 
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
         td {
             width: 15px;
             height: 15px;
@@ -23,20 +28,20 @@
             background: #e1cd34;
         }
         .playerzone {
-            background: dimgrey;
+            background-image: url({{url_for('static', filename='images/brick.png')}});
         }
         .revealed {
-            background: #d2d2d2;
+            filter: brightness(100%);
         }
-        .undiscovered {
-            background: #383434;
+        .unrevealed {
+            filter: brightness(30%);
         }
         .warzone {
-            background: #8c8a8a;
+            background-image: url({{url_for('static', filename='images/grass.png')}});
         }
 
-        td:hover {
-            box-shadow: 0px 0px 2px 2px #84ff12;
+        td.playerzone:hover {
+            filter: brightness(300%);
         }
     </style>
 
