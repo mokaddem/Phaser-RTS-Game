@@ -11,6 +11,7 @@ class MapObject:
         self.height = height #y
         self.width = width #x
         self.isMovable = False
+        self.isWalkable = False
         self.texture = None
         self.name = name
         self.isInvulnerable = True
@@ -26,6 +27,8 @@ class DestructableMapObject(MapObject):
         MapObject.__init__(self, height, width, name)
         self.lifePoint = lifePoint
         self.isInvulnerable = False
+        self.isUnit = False
+        self.isStructure = False
 
     def getLifePoint(self):
         return self.lifePoint
@@ -39,6 +42,7 @@ class DestructableMapObject(MapObject):
 class Structure(DestructableMapObject):
     def __init__(self, height=1, width=1, name="Structure", lifePoint=100):
         DestructableMapObject.__init__(self, height, width, name, lifePoint)
+        self.isStructure = True
 
 class Core(Structure):
     def __init__(self, name="Core"):
@@ -47,7 +51,7 @@ class Core(Structure):
         lifePoint = cfg.getint('structure.core', 'lifePoint')
         Structure.__init__(self, height, width, name, lifePoint)
         
-        self.setTexture('green')
+        self.setTexture('core')
 
 
 ############
@@ -57,6 +61,8 @@ class Core(Structure):
 class Unit(DestructableMapObject):
     def __init__(self, height=1, width=1, name="Unit", lifePoint=10):
         DestructableMapObject.__init__(self, height, width, name, lifePoint)
+        self.isWalkable = True
+        self.isUnit = True
 
 class meleUnit(Unit):
     def __init__(self, name="meleUnit"):

@@ -1,0 +1,164 @@
+<!doctype html>
+    <head>
+        <title>Stratego-battleship</title>
+        <meta charset="utf-8">
+        <script src="{{url_for('static', filename='jquery.js')}}" type="text/javascript"></script>
+    </head>
+
+    <style>
+        body {
+            background: darkgrey;
+        }
+
+        td {
+            width: 15px;
+            height: 15px;
+            border: 1px solid dimgrey;
+        }
+
+        .core {
+            background: #b30000;
+        }
+        .unit {
+            background: #e1cd34;
+        }
+        .revealed {
+            background: #d2d2d2;
+        }
+        .undiscovered {
+            background: #383434;
+        }
+        .warzone {
+            background: dimgrey;
+        }
+
+        td:hover {
+            background: #003eaa;
+        }
+    </style>
+
+    <body>
+        <div>
+            <table>
+                <tbody id="bodyTable">
+                    
+                </tbody>
+            </table>
+        </div>
+    </body>
+
+
+    <script>
+
+    var map_x = 10;
+    var map_y = 2;
+    var playerNum = 2;
+
+    $.getJSON( "{{url_for('getGameConfiguration')}}", function( data ) {
+        map_x = data.width;
+        map_y = data.height;
+        playerNum = data.playerNum;
+        var tbody = window.document.getElementById("bodyTable");
+        for(i=0; i<map_y; i++) {
+            var tr = window.document.createElement("tr");
+            tbody.appendChild(tr);
+            for(j=0; j<map_x; j++) {
+                var td = window.document.createElement("td");
+                td.id = i+','+j;
+                tr.appendChild(td);
+            }
+        }
+    });
+
+
+
+    $.getJSON( "{{url_for('getMapState')}}", function( data ) {
+        for (var row in data) {
+            if (!data.hasOwnProperty(row))
+                continue;
+            
+            row = data[row];
+            for (var col in row) {
+                if (!data.hasOwnProperty(col))
+                    continue;
+                
+                cell = row[col];
+                tileState = cell.tileState;
+
+                setClassByCoord(cell.x, cell.y, tileState.texture);
+            }
+        }
+
+
+
+        //$.each(Object.entries(data), function(rowNum, row) {
+        //    $.each(Object.entries(row), function(colNum, col) {
+        //        var cell = col
+        //        //console.log(cell);
+        //    });
+        //});
+    });
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+    <script>
+        function setClassByCoord(x, y, className) {
+            var td = window.document.getElementById(y+','+x);
+            td.className = className;
+        }
+    </script>
+
+    <script>
+        /*
+        //$('#bodyTable').append("")
+        var map_x = 110;
+        var map_y = 20;
+        var player_zone_x_range = 15;
+        var player_zone_y_range = 20;
+
+        var coreP1_x = 1;
+        var copeP1_y = 10;
+        var coreP2_x = 108;
+        var copeP2_y = 10;
+
+        var tbody = window.document.getElementById("bodyTable");
+        for(i=0; i<map_y; i++) {
+            var tr = window.document.createElement("tr");
+            tbody.appendChild(tr);
+            for(j=0; j<map_x; j++) {
+                var td = window.document.createElement("td");
+                td.id = i+','+j;
+                tr.appendChild(td);
+
+                // set colors
+                if(j<player_zone_x_range) {
+                    td.className = 'revealed';
+                }
+                else if(j>=map_x - player_zone_x_range) {
+                    td.className = 'undiscovered';
+                }
+                else{
+                    td.className = 'warzone';
+                }
+            }
+        }
+
+        setClassByCoord(coreP1_x, copeP1_y, 'core');
+        setClassByCoord(coreP2_x, copeP2_y, 'core');
+
+        setClassByCoord(45, 12, 'unit');
+        setClassByCoord(98, 5, 'unit');
+        */
+    </script>
+
+</html>

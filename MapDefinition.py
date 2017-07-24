@@ -3,11 +3,15 @@
 import configparser
 import json
 from pprint import pprint
+from json import JSONEncoder
 import MapObjectDefinition
 
 cfg = configparser.ConfigParser()
 cfg.read('config.cfg')
 
+class MyEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
 class Map:
     def __init__(self):
         self.height = cfg.getint('map', 'height') #y
@@ -23,20 +27,24 @@ class Map:
                 self.map[x][y] = MapTile(x, y)
 
     def getMapState(self):
-        #state = [[0 for y in range(self.height)] for x in range(self.width)]
         state = {}
         for x in range(self.width):
             state[x] = {}
             for y in range(self.height):
                 state[x][y] = self.map[x][y].getTileState()
         return state
+
+    def getJsonMapState(self):
+        state = self.getMapState()
+        return MyEncoder().encode(state)
     
     def placeObject(self, objectToBePlaced, x, y):
         self.map[x][y].changeTileType(objectToBePlaced)
         
 
     def __repr__(self):
-        return str(self.map)
+        return json.dumps(self.map)
+
 
 class MapTile:
     def __init__(self, x, y, playerNum=2):
@@ -46,13 +54,16 @@ class MapTile:
         self.isRevealedForPlayer = [ False for x in range(playerNum) ]
 
     def __repr__(self):
-        return str(self.tileType)
+        return json.dumps(self.tileType)
 
     def getTileState(self):
-        return self.tileType
+        return { 'tileState': self.tileType, 'x': self.x, 'y': self.y }
 
     def changeTileType(self, newObject):
-        self.tileType = newObject.texture
+        self.tileType.texture = newObject.texture
+        self.tileType.isUnit = newObject.isUnit
+        self.tileType.isStructure = newObject.isStructure
+        self.tileType.isWalkable = newObject.isWalkable
 
 
 class TileType:
@@ -60,25 +71,8 @@ class TileType:
         self.isWalkable = True
         self.isUnit = False
         self.isStructure = False
-        self.texture = 'blue'
+        self.texture = 'revealed'
 
     def __repr__(self):
-        return self.texture
-        #return json.dumps(self, default=lambda o: o.__dict__)
-        #return self.__dict__
+        return json.dumps(self.texture)
 
-
-def main():
-    map = Map()
-    mapState1 = map.getMapState()
-
-    core1 = MapObjectDefinition.Core()
-    map.placeObject(core1, 2, 10)
-    core2 = MapObjectDefinition.Core()
-    map.placeObject(core2, 97, 10)
-
-    mapState = map.getMapState()
-    print(mapState)
-
-if __name__ == "__main__":
-    main()
