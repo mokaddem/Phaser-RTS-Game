@@ -72,17 +72,19 @@ class meleUnit(Unit):
         height = cfg.getint('unit.meleUnit', 'height')
         width = cfg.getint('unit.meleUnit', 'width')
         lifePoint = cfg.getint('unit.meleUnit', 'lifePoint')
-        self.dammage = cfg.getint('unit.meleUnit', 'dammage')
+        self.damage = cfg.getint('unit.meleUnit', 'damage')
         self.range = cfg.getint('unit.meleUnit', 'range')
 
         Unit.__init__(self, height, width, name, lifePoint)
+
+        self.setTileColor('unit')
 
 class rangedUnit(Unit):
     def __init__(self, name="rangedUnit"):
         height = cfg.getint('unit.rangedUnit', 'height')
         width = cfg.getint('unit.rangedUnit', 'width')
         lifePoint = cfg.getint('unit.rangedUnit', 'lifePoint')
-        self.dammage = cfg.getint('unit.rangedUnit', 'dammage')
+        self.damage = cfg.getint('unit.rangedUnit', 'damage')
         self.range = cfg.getint('unit.rangedUnit', 'range')
 
         Unit.__init__(self, height, width, name, lifePoint)

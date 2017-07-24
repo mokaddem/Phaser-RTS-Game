@@ -73,6 +73,10 @@
             for(j=0; j<map_x; j++) {
                 var td = window.document.createElement("td");
                 td.id = i+','+j;
+                td.dataset.x = j;
+                td.dataset.y = i;
+                //td.setAttribute('data',"x: "+i); 
+                //td.setAttribute('data',"y: "+j); 
                 tr.appendChild(td);
             }
         }
@@ -91,32 +95,16 @@
                     continue;
                 
                 cell = row[col];
-                tileState = cell.tileState;
+                tileType = cell.tileType;
 
-                setClassByCoord(cell.x, cell.y, tileState.tileColor);
+                setClassByCoord(cell.x, cell.y, tileType.tileColor);
             }
         }
-
-
-
-        //$.each(Object.entries(data), function(rowNum, row) {
-        //    $.each(Object.entries(row), function(colNum, col) {
-        //        var cell = col
-        //        //console.log(cell);
-        //    });
-        //});
+        addClickListener();
     });
 
 
     </script>
-
-
-
-
-
-
-
-
 
 
     <script>
@@ -127,46 +115,49 @@
     </script>
 
     <script>
-        /*
-        //$('#bodyTable').append("")
-        var map_x = 110;
-        var map_y = 20;
-        var player_zone_x_range = 15;
-        var player_zone_y_range = 20;
-
-        var coreP1_x = 1;
-        var copeP1_y = 10;
-        var coreP2_x = 108;
-        var copeP2_y = 10;
-
-        var tbody = window.document.getElementById("bodyTable");
-        for(i=0; i<map_y; i++) {
-            var tr = window.document.createElement("tr");
-            tbody.appendChild(tr);
-            for(j=0; j<map_x; j++) {
-                var td = window.document.createElement("td");
-                td.id = i+','+j;
-                tr.appendChild(td);
-
-                // set colors
-                if(j<player_zone_x_range) {
-                    td.className = 'revealed';
-                }
-                else if(j>=map_x - player_zone_x_range) {
-                    td.className = 'undiscovered';
-                }
-                else{
-                    td.className = 'warzone';
-                }
-            }
+        function addClickListener() {
+            $( ".playerzone" ).click(function() {
+                clickedCell = $( this );
+                var Cell = new Object();
+                Cell.x = clickedCell.data('x');
+                Cell.y = clickedCell.data('y');
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(Cell),
+                    dataType: 'json',
+                    url: '{{url_for("clickCell")}}',
+                    success: function (updateData) {
+                        console.log(updateData);
+                    }
+                });
+            });
         }
 
-        setClassByCoord(coreP1_x, copeP1_y, 'core');
-        setClassByCoord(coreP2_x, copeP2_y, 'core');
+        function baseMapUpdate() {
+            var requestObject = new Object();
+            requestObject.basic = true;
+            $.ajax({
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(requestObject),
+                dataType: 'json',
+                url: '{{url_for("baseMapUpdate")}}',
+                success: function (updateData) {
+                    updateMap(updateData)
+                }
+            });
+        }
 
-        setClassByCoord(45, 12, 'unit');
-        setClassByCoord(98, 5, 'unit');
-        */
+        function updateMap(updateDataArray) {
+            //console.log('updating');
+            for (updateDataStr of updateDataArray) {
+                var updateData = jQuery.parseJSON( updateDataStr );
+                var tileType = updateData.tileType;
+                setClassByCoord(updateData.x, updateData.y, tileType.tileColor);
+            }
+        }
+        setInterval(function(){ baseMapUpdate(); }, 200);
     </script>
 
 </html>

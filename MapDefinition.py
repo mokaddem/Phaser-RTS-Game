@@ -12,6 +12,7 @@ cfg.read('config.cfg')
 class MyEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
+
 class Map:
     def __init__(self):
         self.height = cfg.getint('map', 'height') #y
@@ -35,6 +36,9 @@ class Map:
             for y in range(self.height):
                 state[x][y] = self.map[x][y].getTileState()
         return state
+
+    def getJsonCell(self, x, y):
+        return MyEncoder().encode(self.map[x][y])
 
     def getJsonMapState(self):
         state = self.getMapState()
@@ -60,7 +64,7 @@ class MapTile:
         return json.dumps(self.tileType)
 
     def getTileState(self):
-        return { 'tileState': self.tileType, 'x': self.x, 'y': self.y }
+        return { 'tileType': self.tileType, 'x': self.x, 'y': self.y }
 
     def changeTileType(self, newObject):
         self.tileType.tileColor = newObject.tileColor

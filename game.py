@@ -3,7 +3,7 @@
 import configparser
 import json
 from pprint import pprint
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 app = Flask(__name__, static_url_path='/static/')
 
 import MapObjectDefinition
@@ -13,6 +13,7 @@ cfg = configparser.ConfigParser()
 cfg.read('config.cfg')
 
 the_map = None
+all_updates = []
 
 @app.route('/')
 def index():
@@ -21,7 +22,6 @@ def index():
 @app.route("/getMapState/")
 def getMapState():
     the_state = the_map.getJsonMapState()
-    pprint(the_state)
     return the_state
     #return jsonify(the_state)
 
@@ -32,6 +32,28 @@ def getGameConfiguration():
     gameConf['height'] = cfg.getint('map', 'height') #y
     gameConf['playerNum'] = cfg.getint('map', 'playerNum')
     return jsonify(gameConf)
+
+@app.route('/baseMapUpdate/', methods = ['POST'])
+def baseMapUpdate():
+    jsondata = request.get_json()
+
+    return json.dumps(all_updates)
+
+@app.route('/clickCell/', methods = ['POST'])
+def clickCell():
+    jsondata = request.get_json()
+    x = jsondata['x']
+    y = jsondata['y']
+    unit = MapObjectDefinition.meleUnit()
+    the_map.placeObject(unit, x, y)
+
+    modif_obj = the_map.getJsonCell(x, y)
+    #to_return = []
+    #to_return.append(modif_obj)
+    #return json.dumps(to_return)
+    
+    all_updates.append(modif_obj)
+    return json.dumps({})
 
 
 def main():
