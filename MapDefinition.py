@@ -14,11 +14,12 @@ class MyEncoder(JSONEncoder):
         return o.__dict__
 
 class Map:
-    def __init__(self):
+    def __init__(self, all_updates):
         self.height = cfg.getint('map', 'height') #y
         self.width = cfg.getint('map', 'width') #x
         self.playerNum = cfg.getint('map', 'playerNum')
         self.playerWidthZone = cfg.getint('map', 'playerWidthZone')
+        self.all_updates = all_updates
 
         #Create map tiles
         #self.map = [[0 for y in range(self.height)] for x in range(self.width)]
@@ -45,11 +46,14 @@ class Map:
         return MyEncoder().encode(state)
     
     def placeObject(self, objectToBePlaced, x, y):
-        self.map[x][y].changeTileType(objectToBePlaced)
+        modif_obj = self.map[x][y].changeTileType(objectToBePlaced)
+        modif_obj_json = MyEncoder().encode(modif_obj)
+        self.all_updates.append(modif_obj_json)
         
 
     def __repr__(self):
-        return json.dumps(self.map)
+        return MyEncoder().encode(self.map)
+        #return json.dumps(self.map)
 
 
 class MapTile:
@@ -61,7 +65,8 @@ class MapTile:
         self.isRevealedForPlayer = [ False for x in range(playerNum) ]
 
     def __repr__(self):
-        return json.dumps(self.tileType)
+        return MyEncoder().encode(self.tileType)
+        #return json.dumps(self.tileType)
 
     def getTileState(self):
         return { 'tileType': self.tileType, 'x': self.x, 'y': self.y }
@@ -71,6 +76,7 @@ class MapTile:
         self.tileType.isUnit = newObject.isUnit
         self.tileType.isStructure = newObject.isStructure
         self.tileType.isWalkable = newObject.isWalkable
+        return self
 
 
 class TileType:
@@ -84,5 +90,6 @@ class TileType:
             self.tileColor = 'warzone'
 
     def __repr__(self):
-        return json.dumps(self.tileColor)
+        return MyEncoder().encode(self.tileColor)
+        #return json.dumps(self.tileColor)
 
