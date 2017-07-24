@@ -47,9 +47,11 @@ class mainGamelogicThread(threading.Thread):
         print("Exiting main game logic thread", time.ctime(time.time()))
 
     def start_main_loop(self):
-        core1 = MapObjectDefinition.Core()
+        core1 = MapObjectDefinition.Core(player=1)
+        core2 = MapObjectDefinition.Core(player=2)
+        self.allStructures.append(core1)
+        self.allStructures.append(core2)
         self.the_map.placeObject(core1, 2, 10)
-        core2 = MapObjectDefinition.Core()
         self.the_map.placeObject(core2, 97, 10)
     
         while True:
@@ -62,13 +64,16 @@ class mainGamelogicThread(threading.Thread):
                     x = request.x
                     y = request.y
                     if request.theType == 'meleUnit':
-                        unit = MapObjectDefinition.meleUnit()
+                        unit = MapObjectDefinition.MeleUnit(player=1)
+                        self.allUnits.append(unit)
                         self.the_map.placeObject(unit, x, y)
                         print('MeleUnit created and placed')
                     elif request.theType == 'rangedUnit':
-                        unit = MapObjectDefinition.rangedUnit()
+                        unit = MapObjectDefinition.RangedUnit(player=1)
+                        self.allUnits.append(unit)
                         self.the_map.placeObject(unit, x, y)
                 self.executeGameLogic()
     
     def executeGameLogic(self):
-        pass
+        for unit in self.allUnits:
+            unit.behave()
