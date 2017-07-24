@@ -17,6 +17,7 @@ class Map:
         self.height = cfg.getint('map', 'height') #y
         self.width = cfg.getint('map', 'width') #x
         self.playerNum = cfg.getint('map', 'playerNum')
+        self.playerWidthZone = cfg.getint('map', 'playerWidthZone')
 
         #Create map tiles
         #self.map = [[0 for y in range(self.height)] for x in range(self.width)]
@@ -24,7 +25,8 @@ class Map:
         for x in range(self.width):
             self.map[x] = {}
             for y in range(self.height):
-                self.map[x][y] = MapTile(x, y)
+                isPlayerZone = True if (x < self.playerWidthZone or x > self.width - self.playerWidthZone) else False
+                self.map[x][y] = MapTile(x, y, isPlayerZone=isPlayerZone)
 
     def getMapState(self):
         state = {}
@@ -47,10 +49,11 @@ class Map:
 
 
 class MapTile:
-    def __init__(self, x, y, playerNum=2):
+    def __init__(self, x, y, playerNum=2, isPlayerZone=False):
         self.x = x
         self.y = y
-        self.tileType = TileType()
+        self.isPlayerZone = isPlayerZone
+        self.tileType = TileType(isPlayerZone)
         self.isRevealedForPlayer = [ False for x in range(playerNum) ]
 
     def __repr__(self):
@@ -60,19 +63,22 @@ class MapTile:
         return { 'tileState': self.tileType, 'x': self.x, 'y': self.y }
 
     def changeTileType(self, newObject):
-        self.tileType.texture = newObject.texture
+        self.tileType.tileColor = newObject.tileColor
         self.tileType.isUnit = newObject.isUnit
         self.tileType.isStructure = newObject.isStructure
         self.tileType.isWalkable = newObject.isWalkable
 
 
 class TileType:
-    def __init__(self):
+    def __init__(self, isPlayerZone=False):
         self.isWalkable = True
         self.isUnit = False
         self.isStructure = False
-        self.texture = 'revealed'
+        if isPlayerZone:
+            self.tileColor = 'playerzone'
+        else:
+            self.tileColor = 'warzone'
 
     def __repr__(self):
-        return json.dumps(self.texture)
+        return json.dumps(self.tileColor)
 

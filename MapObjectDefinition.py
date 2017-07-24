@@ -19,6 +19,9 @@ class MapObject:
     def setTexture(self, texture):
         self.texture = texture
 
+    def setTileColor(self, tileColor):
+        self.tileColor = tileColor
+
     def __repr__(self):
         return str(self.name)
 
@@ -51,7 +54,7 @@ class Core(Structure):
         lifePoint = cfg.getint('structure.core', 'lifePoint')
         Structure.__init__(self, height, width, name, lifePoint)
         
-        self.setTexture('core')
+        self.setTileColor('core')
 
 
 ############
