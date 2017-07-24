@@ -27,7 +27,7 @@ class Map:
         for x in range(self.width):
             self.map[x] = {}
             for y in range(self.height):
-                isPlayerZone = True if (x < self.playerWidthZone or x > self.width - self.playerWidthZone) else False
+                isPlayerZone = self.isCoordInPlayerZone(x, y)
                 self.map[x][y] = MapTile(x, y, isPlayerZone=isPlayerZone)
 
     def getMapState(self):
@@ -44,11 +44,28 @@ class Map:
     def getJsonMapState(self):
         state = self.getMapState()
         return MyEncoder().encode(state)
+
+    def isCoordInPlayerZone(self, x, y):
+        isPlayerZone = True if (x < self.playerWidthZone or x > self.width - self.playerWidthZone) else False
+        return isPlayerZone
     
     def placeObject(self, objectToBePlaced, x, y):
         modif_obj = self.map[x][y].changeTileType(objectToBePlaced)
         modif_obj_json = MyEncoder().encode(modif_obj)
         self.all_updates.append(modif_obj_json)
+
+    def moveObject(self, objectToMove, deltaX=1, deltaY=0):
+        startX = objectToMove.posX
+        startY = objectToMove.posY
+        emptyObject = MapTile(startX, startY, isPlayerZone=self.isCoordInPlayerZone(startX, startY))
+        modif_emptyObj = self.map[startX][startY].changeTileType(emptyObject.tileType)
+        modif_emptyObj_json = MyEncoder().encode(modif_emptyObj)
+        self.all_updates.append(modif_emptyObj_json)
+
+        modif_obj = self.map[startX+deltaX][startY+deltaY].changeTileType(objectToMove)
+        modif_obj_json = MyEncoder().encode(modif_obj)
+        self.all_updates.append(modif_obj_json)
+
         
 
     def __repr__(self):

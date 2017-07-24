@@ -47,7 +47,10 @@ def clickCell():
     x = jsondata['x']
     y = jsondata['y']
 
-    ThePlayerRequest = PlayerRequest('unit', 'meleUnit', x, y)
+    import random
+    unitType = 'meleUnit' if random.random() > 0.5 else 'rangedUnit'
+    ThePlayerRequest = PlayerRequest('unit', unitType, x, y)
+    #ThePlayerRequest = PlayerRequest('unit', 'ranged#Unit', x, y)
     all_requests.append(ThePlayerRequest)
 
     return json.dumps({})
@@ -57,7 +60,7 @@ def main():
     global the_map
     the_map = MapDefinition.Map(all_updates)
 
-    mainGamelogic = mainGamelogicThread("gameLogic", the_map, all_requests, all_updates)
+    mainGamelogic = mainGamelogicThread("gameLogic", the_map, all_requests)
     mainGamelogic.start()
 
 

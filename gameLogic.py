@@ -31,12 +31,11 @@ class PlayerRequest():
 
 
 class mainGamelogicThread(threading.Thread):
-    def __init__(self, name, the_map, all_requests, all_updates):
+    def __init__(self, name, the_map, all_requests):
         threading.Thread.__init__(self)
         self.name = name
         self.the_map = the_map
         self.all_requests = all_requests
-        self.all_updates = all_updates
 
         self.allUnits = []
         self.allStructures = []
@@ -47,8 +46,8 @@ class mainGamelogicThread(threading.Thread):
         print("Exiting main game logic thread", time.ctime(time.time()))
 
     def start_main_loop(self):
-        core1 = MapObjectDefinition.Core(player=1)
-        core2 = MapObjectDefinition.Core(player=2)
+        core1 = MapObjectDefinition.Core(self.the_map, player=1)
+        core2 = MapObjectDefinition.Core(self.the_map, player=2)
         self.allStructures.append(core1)
         self.allStructures.append(core2)
         self.the_map.placeObject(core1, 2, 10)
@@ -64,15 +63,16 @@ class mainGamelogicThread(threading.Thread):
                     x = request.x
                     y = request.y
                     if request.theType == 'meleUnit':
-                        unit = MapObjectDefinition.MeleUnit(player=1)
+                        unit = MapObjectDefinition.MeleUnit(self.the_map, player=1, posX=x, posY=y)
                         self.allUnits.append(unit)
                         self.the_map.placeObject(unit, x, y)
                         print('MeleUnit created and placed')
                     elif request.theType == 'rangedUnit':
-                        unit = MapObjectDefinition.RangedUnit(player=1)
+                        unit = MapObjectDefinition.RangedUnit(self.the_map, player=1, posX=x, posY=y)
                         self.allUnits.append(unit)
                         self.the_map.placeObject(unit, x, y)
-                self.executeGameLogic()
+
+            self.executeGameLogic()
     
     def executeGameLogic(self):
         for unit in self.allUnits:
