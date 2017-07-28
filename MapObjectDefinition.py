@@ -3,13 +3,12 @@
 import configparser
 import time
 from pprint import pprint
+import settings as glob
 
-cfg = configparser.ConfigParser()
-cfg.read('config.cfg')
+cfg = glob.cfg
 
 class MapObject:
-    def __init__(self, the_map, height=1, width=1, name="MapObject", posX=0, posY=0):
-        self.the_map = the_map
+    def __init__(self, height=1, width=1, name="MapObject", posX=0, posY=0):
         self.height = height #y
         self.width = width #x
         self.isMovable = False
@@ -87,9 +86,8 @@ class Unit(DestructableMapObject):
 
     def move(self):
         if time.time() - self.lastTimeMoved > 1.0/self.speed:
-            print('moving')
             self.lastTimeMoved = time.time()
-            self.the_map.moveObject(self, deltaX=1, deltaY=0)
+            glob.the_map.moveObject(self, deltaX=1, deltaY=0)
             self.posX += 1
         else:
             pass
@@ -110,7 +108,6 @@ class MeleUnit(Unit):
         self.range = cfg.getint('unit.meleUnit', 'range')
         self.speed = cfg.getfloat('unit.meleUnit', 'speed')
 
-
         self.setTileColor('unitMele')
 
 class RangedUnit(Unit):
@@ -122,6 +119,5 @@ class RangedUnit(Unit):
         self.damage = cfg.getint('unit.rangedUnit', 'damage')
         self.range = cfg.getint('unit.rangedUnit', 'range')
         self.speed = cfg.getfloat('unit.rangedUnit', 'speed')
-
 
         self.setTileColor('unitRanged')

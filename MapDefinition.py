@@ -4,22 +4,22 @@ import configparser
 import json
 from pprint import pprint
 from json import JSONEncoder
+
+import settings as glob
 import MapObjectDefinition
 
-cfg = configparser.ConfigParser()
-cfg.read('config.cfg')
+cfg = glob.cfg
 
 class MyEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
 
 class Map:
-    def __init__(self, all_updates):
+    def __init__(self):
         self.height = cfg.getint('map', 'height') #y
         self.width = cfg.getint('map', 'width') #x
         self.playerNum = cfg.getint('map', 'playerNum')
         self.playerWidthZone = cfg.getint('map', 'playerWidthZone')
-        self.all_updates = all_updates
 
         #Create map tiles
         #self.map = [[0 for y in range(self.height)] for x in range(self.width)]
@@ -52,7 +52,7 @@ class Map:
     def placeObject(self, objectToBePlaced, x, y):
         modif_obj = self.map[x][y].changeTileType(objectToBePlaced)
         modif_obj_json = MyEncoder().encode(modif_obj)
-        self.all_updates.append(modif_obj_json)
+        glob.all_updates.append(modif_obj_json)
 
     def moveObject(self, objectToMove, deltaX=1, deltaY=0):
         startX = objectToMove.posX
@@ -60,11 +60,11 @@ class Map:
         emptyObject = MapTile(startX, startY, isPlayerZone=self.isCoordInPlayerZone(startX, startY))
         modif_emptyObj = self.map[startX][startY].changeTileType(emptyObject.tileType)
         modif_emptyObj_json = MyEncoder().encode(modif_emptyObj)
-        self.all_updates.append(modif_emptyObj_json)
+        glob.all_updates.append(modif_emptyObj_json)
 
         modif_obj = self.map[startX+deltaX][startY+deltaY].changeTileType(objectToMove)
         modif_obj_json = MyEncoder().encode(modif_obj)
-        self.all_updates.append(modif_obj_json)
+        glob.all_updates.append(modif_obj_json)
 
         
 

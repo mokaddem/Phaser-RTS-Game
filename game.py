@@ -1,21 +1,31 @@
 #!/usr/bin/python3
 
-import configparser
 import json
+import time
 from pprint import pprint
 from flask import Flask, render_template, jsonify, request
-app = Flask(__name__, static_url_path='/static/')
+from flask_socketio import SocketIO, emit, send
 
+import settings as glob
 import MapObjectDefinition
 import MapDefinition
 from gameLogic import mainGamelogicThread, PlayerRequest
 
-cfg = configparser.ConfigParser()
-cfg.read('config.cfg')
+import eventlet
+eventlet.monkey_patch()
 
-the_map = None
+app = Flask(__name__, static_url_path='/static/')
+glob.app = app
+#socketio = SocketIO(app)
+socketio = SocketIO(app, message_queue='redis://')
+glob.socketio = socketio
+
+cfg = glob.cfg
+
 all_requests = []
+glob.all_requests = all_requests
 all_updates = []
+glob.allupdates = all_updates
 
 @app.route('/')
 def index():
@@ -23,7 +33,7 @@ def index():
 
 @app.route("/getMapState/")
 def getMapState():
-    the_state = the_map.getJsonMapState()
+    the_state = glob.the_map.getJsonMapState()
     return the_state
     #return jsonify(the_state)
 
@@ -35,36 +45,49 @@ def getGameConfiguration():
     gameConf['playerNum'] = cfg.getint('map', 'playerNum')
     return jsonify(gameConf)
 
-@app.route('/baseMapUpdate/', methods = ['POST'])
-def baseMapUpdate():
-    jsondata = request.get_json()
+#@socketio.on('baseMapUpdate')
+#def handle_baseMapUpdate(receivedJson):
+#    global all_updates
 
-    return json.dumps(all_updates)
-
-@app.route('/clickCell/', methods = ['POST'])
-def clickCell():
-    jsondata = request.get_json()
-    x = jsondata['x']
+@socketio.on('cell')
+def handle_cell(receivedJson):
+    print('received json: ' + str(receivedJson))
+    jsondata = receivedJson['data']
+    x = jsondata["x"]
     y = jsondata['y']
 
     import random
     unitType = 'meleUnit' if random.random() > 0.5 else 'rangedUnit'
     ThePlayerRequest = PlayerRequest('unit', unitType, x, y)
     #ThePlayerRequest = PlayerRequest('unit', 'ranged#Unit', x, y)
-    all_requests.append(ThePlayerRequest)
+    glob.all_requests.append(ThePlayerRequest)
+    #emit('my response', {'x': x, 'y': y})
 
-    return json.dumps({})
+
+@socketio.on('hi')
+def hi_handler(message):
+    print(message)
+    glob.socketio.emit('serverRep', {'s': 'x'})
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('/!\ CLIENT DISCONNECTED /!\ ')
+
+@socketio.on('connect')
+def test_connect():
+    print('Client connected')
+    glob.startGame = True
 
 
 def main():
-    global the_map
-    the_map = MapDefinition.Map(all_updates)
+    glob.the_map = MapDefinition.Map()
 
-    mainGamelogic = mainGamelogicThread("gameLogic", the_map, all_requests)
+    mainGamelogic = mainGamelogicThread("gameLogic")
     mainGamelogic.start()
 
 
 if __name__ == "__main__":
     main()
     #app.run(host='0.0.0.0', port=9000, threaded=True)
-    app.run(host='0.0.0.0', port=9000)
+    #app.run(host='0.0.0.0', port=9000)
+    socketio.run(app, host='0.0.0.0', port=9000)
