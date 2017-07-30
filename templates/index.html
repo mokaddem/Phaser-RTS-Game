@@ -86,8 +86,7 @@
 
         socket.on('baseMapUpdateResp', function(updateData) {
             if (isGameConfigured) {
-                console.log(updateData);
-                updateMap(updateData);
+                parseData(updateData);
             } else {
                 console.log('Update received but game not configured yet')
             }
@@ -175,11 +174,29 @@
             });
         }
 
-        function updateMap(updateDataArray) {
+        function parseData(updateDataArray) {
             for (updateDataStr of updateDataArray) {
                 var updateData = jQuery.parseJSON( updateDataStr );
-                var tileType = updateData.tileType;
-                setClassByCoord(updateData.x, updateData.y, tileType.tileColor);
+                var type = updateData.type;
+                var name = updateData.name;
+                var id_num = updateData.id_num;
+                
+                if (type == 'placing') {
+                    var x = updateData.x;
+                    var y = updateData.y;
+                    console.log(name+id_num+' '+x+', '+y);
+                } else if (type == 'moving') {
+                    var startX = updateData.startX;
+                    var startY = updateData.startY;
+                    var deltaX = updateData.deltaX;
+                    var deltaY = updateData.deltaY;
+                    var endX = startX + deltaX;
+                    var endY = startY + deltaY;
+                    console.log(name+id_num+' '+startX+'->'+endX+', '+startY+'->'+endY);
+                }
+
+                //var tileType = updateData.tileType;
+                //setClassByCoord(updateData.x, updateData.y, tileType.tileColor);
             }
         }
 
