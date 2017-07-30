@@ -51,6 +51,7 @@ class Map:
     
     def placeObject(self, objectToBePlaced, x, y):
         modif_obj = self.map[x][y].changeTileType(objectToBePlaced)
+        modif_obj = {'name': objectToBePlaced.name, 'id_num': objectToBePlaced.id_num, 'x': x, 'y': y}
         modif_obj_json = MyEncoder().encode(modif_obj)
         glob.all_updates.append(modif_obj_json)
 
@@ -60,9 +61,10 @@ class Map:
         emptyObject = MapTile(startX, startY, isPlayerZone=self.isCoordInPlayerZone(startX, startY))
         modif_emptyObj = self.map[startX][startY].changeTileType(emptyObject.tileType)
         modif_emptyObj_json = MyEncoder().encode(modif_emptyObj)
-        glob.all_updates.append(modif_emptyObj_json)
+        #glob.all_updates.append(modif_emptyObj_json)
 
         modif_obj = self.map[startX+deltaX][startY+deltaY].changeTileType(objectToMove)
+        modif_obj = {'name': objectToMove.name, 'id_num': objectToMove.id_num, 'startX': startX, 'startY': startY, 'deltaX': deltaX, 'deltaY': deltaY}
         modif_obj_json = MyEncoder().encode(modif_obj)
         glob.all_updates.append(modif_obj_json)
 

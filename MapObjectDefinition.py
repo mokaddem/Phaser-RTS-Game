@@ -54,12 +54,15 @@ class Structure(DestructableMapObject):
         self.isStructure = True
 
 class Core(Structure):
+    id_num = 0
     def __init__(self, *args, **kwargs):
+        Core.id_num += 1
         super(Core, self).__init__(*args, name="Core", **kwargs)
         height = cfg.getint('structure.core', 'height')
         width = cfg.getint('structure.core', 'width')
         lifePoint = cfg.getint('structure.core', 'lifePoint')
         
+        self.name = "Core"
         self.setTileColor('core')
 
 
@@ -99,7 +102,9 @@ class Unit(DestructableMapObject):
             self.move()
 
 class MeleUnit(Unit):
+    id_num = 0
     def __init__(self, *args, name="Unit",  **kwargs):
+        MeleUnit.id_num += 1
         super(MeleUnit, self).__init__(*args, **kwargs)
         height = cfg.getint('unit.meleUnit', 'height')
         width = cfg.getint('unit.meleUnit', 'width')
@@ -108,10 +113,13 @@ class MeleUnit(Unit):
         self.range = cfg.getint('unit.meleUnit', 'range')
         self.speed = cfg.getfloat('unit.meleUnit', 'speed')
 
+        self.name = "Mele unit"
         self.setTileColor('unitMele')
 
 class RangedUnit(Unit):
+    id_num = 0
     def __init__(self, *args, name="Unit",  **kwargs):
+        RangedUnit.id_num += 1
         super(RangedUnit, self).__init__(*args, **kwargs)
         height = cfg.getint('unit.rangedUnit', 'height')
         width = cfg.getint('unit.rangedUnit', 'width')
@@ -120,4 +128,5 @@ class RangedUnit(Unit):
         self.range = cfg.getint('unit.rangedUnit', 'range')
         self.speed = cfg.getfloat('unit.rangedUnit', 'speed')
 
+        self.name = "Ranged unit"
         self.setTileColor('unitRanged')
