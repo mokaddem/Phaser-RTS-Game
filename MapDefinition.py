@@ -51,7 +51,7 @@ class Map:
     
     def placeObject(self, objectToBePlaced, x, y):
         modif_obj = self.map[x][y].changeTileType(objectToBePlaced)
-        modif_obj = {'type': 'placing', 'name': objectToBePlaced.name, 'id_num': objectToBePlaced.id_num, 'x': x, 'y': y}
+        modif_obj = {'action': 'placing', 'name': objectToBePlaced.name, 'id_num': objectToBePlaced.id_num, 'x': x, 'y': y}
         modif_obj_json = MyEncoder().encode(modif_obj)
         glob.all_updates.append(modif_obj_json)
 
@@ -64,7 +64,7 @@ class Map:
         #glob.all_updates.append(modif_emptyObj_json)
 
         modif_obj = self.map[startX+deltaX][startY+deltaY].changeTileType(objectToMove)
-        modif_obj = {'type': 'moving', 'name': objectToMove.name, 'id_num': objectToMove.id_num, 'startX': startX, 'startY': startY, 'deltaX': deltaX, 'deltaY': deltaY}
+        modif_obj = {'action': 'moving', 'name': objectToMove.name, 'id_num': objectToMove.id_num, 'startX': startX, 'startY': startY, 'deltaX': deltaX, 'deltaY': deltaY}
         modif_obj_json = MyEncoder().encode(modif_obj)
         glob.all_updates.append(modif_obj_json)
 

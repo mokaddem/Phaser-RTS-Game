@@ -113,7 +113,7 @@ class MeleUnit(Unit):
         self.range = cfg.getint('unit.meleUnit', 'range')
         self.speed = cfg.getfloat('unit.meleUnit', 'speed')
 
-        self.name = "Mele unit"
+        self.name = "knight"
         self.setTileColor('unitMele')
 
 class RangedUnit(Unit):
@@ -128,5 +128,5 @@ class RangedUnit(Unit):
         self.range = cfg.getint('unit.rangedUnit', 'range')
         self.speed = cfg.getfloat('unit.rangedUnit', 'speed')
 
-        self.name = "Ranged unit"
+        self.name = "canon"
         self.setTileColor('unitRanged')

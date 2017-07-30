@@ -105,6 +105,8 @@
     var map_y = 2;
     var playerNum = 2;
     var isGameConfigured = false;
+setTimeout(function(){isGameConfigured=true;}, 1000);
+    var allUnits = {};
 
     function getGameConfiguration() {
         $.getJSON( "{{url_for('getGameConfiguration')}}", function( data ) {
@@ -130,14 +132,7 @@
                 units = game.add.group();
                 units.enableBody = true;
             
-                var knight = units.create(0, 0, 'knight');
-                var canon = units.create(200, 200, 'canon');
 
-                knight.animations.add('walk');
-                knight.animations.play('walk', 10, true);
-
-                canon.animations.add('walk');
-                canon.animations.play('walk', 10, true);
             }
             
             function update() {
@@ -208,18 +203,26 @@
             });
         }
 
+                var Cell = new Object();
+                Cell.x = 5;
+                Cell.y = 2;
+                setTimeout(function(){socket.emit('cell', {data: Cell});}, 5000);
+
         function parseData(updateDataArray) {
             for (updateDataStr of updateDataArray) {
                 var updateData = jQuery.parseJSON( updateDataStr );
-                var type = updateData.type;
+                var action = updateData.action;
                 var name = updateData.name;
+                //var unitType = updateData.unitType;
+                var unitType = name;
                 var id_num = updateData.id_num;
                 
-                if (type == 'placing') {
+                if (action == 'placing') {
                     var x = updateData.x;
                     var y = updateData.y;
                     console.log(name+id_num+' '+x+', '+y);
-                } else if (type == 'moving') {
+                    createUnit(unitType, id_num, x, y);
+                } else if (action == 'moving') {
                     var startX = updateData.startX;
                     var startY = updateData.startY;
                     var deltaX = updateData.deltaX;
@@ -227,6 +230,7 @@
                     var endX = startX + deltaX;
                     var endY = startY + deltaY;
                     console.log(name+id_num+' '+startX+'->'+endX+', '+startY+'->'+endY);
+                    moveUnit(unitType, id_num, startX, startY, deltaX, deltaY);
                 }
 
                 //var tileType = updateData.tileType;
@@ -234,6 +238,20 @@
             }
         }
 
+        function createUnit(unitType, unitId, posX, posY) {
+            var newUnit = units.create(posX, posY, unitType);
+            newUnit.animations.add('walk');
+            newUnit.animations.play('walk', 10, true);
+            allUnits.unitId =  newUnit;
+        }
+
+        function moveUnit(unitType, unitId, posX, posY, deltaX, deltaY) {
+            var unitToMove = allUnits.unitId;
+            unitToMove.x = posX;
+            unitToMove.y = posY;
+            unitToMove.x += deltaX;
+            unitToMove.y += deltaY;
+        }
     </script>
 
 </html>
