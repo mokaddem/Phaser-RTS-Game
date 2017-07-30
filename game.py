@@ -61,13 +61,7 @@ def handle_cell(receivedJson):
     ThePlayerRequest = PlayerRequest('unit', unitType, x, y)
     #ThePlayerRequest = PlayerRequest('unit', 'ranged#Unit', x, y)
     glob.all_requests.append(ThePlayerRequest)
-    #emit('my response', {'x': x, 'y': y})
 
-
-@socketio.on('hi')
-def hi_handler(message):
-    print(message)
-    glob.socketio.emit('serverRep', {'s': 'x'})
 
 @socketio.on('disconnect')
 def test_disconnect():

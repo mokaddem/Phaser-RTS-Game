@@ -63,12 +63,11 @@
     </body>
 
     <script>
-
         //socket = io.connect('192.168.0.7:9000');
         //socket = io.connect('localhost:9000');
         //socket = io.connect('http://' + document.domain + ':' + location.port);
         //var socket = io.connect('localhost:9000');
-        var socket = io.connect();
+        var socket = io.connect('localhost:9000');
         socket.on('serverRep', function(msg) {
             console.log(msg);
         });
@@ -79,7 +78,6 @@
         socket.on('connect', function(socket) {
             console.log('connected');
             getGameConfiguration();
-            getMapState();
         });
 
         socket.on('msg', function(data) {
@@ -87,15 +85,16 @@
         });
 
         socket.on('baseMapUpdateResp', function(updateData) {
-            console.log(updateData);
-            updateMap(updateData);
+            if (isGameConfigured) {
+                console.log(updateData);
+                updateMap(updateData);
+            } else {
+                console.log('Update received but game not configured yet')
+            }
         });
 
         $( document ).ready(function(){
             console.log('doc ready');
-
-            //socket.emit('hi', {'hi': 'fromclient'});
-
         });
     </script>
 
@@ -104,6 +103,7 @@
     var map_x = 10;
     var map_y = 2;
     var playerNum = 2;
+    var isGameConfigured = false;
 
     function getGameConfiguration() {
         $.getJSON( "{{url_for('getGameConfiguration')}}", function( data ) {
@@ -119,11 +119,10 @@
                     td.id = i+','+j;
                     td.dataset.x = j;
                     td.dataset.y = i;
-                    //td.setAttribute('data',"x: "+i); 
-                    //td.setAttribute('data',"y: "+j); 
                     tr.appendChild(td);
                 }
             }
+            getMapState();
         });
     }
 
@@ -145,6 +144,7 @@
                 }
             }
             addClickListener();
+            isGameConfigured = true;
         });
     }
 
@@ -176,7 +176,6 @@
         }
 
         function updateMap(updateDataArray) {
-            //console.log('updating');
             for (updateDataStr of updateDataArray) {
                 var updateData = jQuery.parseJSON( updateDataStr );
                 var tileType = updateData.tileType;
