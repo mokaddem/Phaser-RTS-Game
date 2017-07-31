@@ -101,6 +101,7 @@
 
     <script>
 
+    var game;
     var map_x = 10;
     var map_y = 2;
     var playerNum = 2;
@@ -114,7 +115,7 @@ setTimeout(function(){isGameConfigured=true;}, 1000);
             map_y = data.height;
             playerNum = data.playerNum;
 
-            var game = new Phaser.Game(1792, 359, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update });
+            game = new Phaser.Game(1792, 359, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update });
             
             function preload() {
                 game.load.image('ground', '{{url_for("static", filename="images/map.png")}}');
@@ -138,44 +139,9 @@ setTimeout(function(){isGameConfigured=true;}, 1000);
             function update() {
             }
 
-            //var tbody = window.document.getElementById("bodyTable");
-            //for(i=0; i<map_y; i++) {
-            //    var tr = window.document.createElement("tr");
-            //    tbody.appendChild(tr);
-            //    for(j=0; j<map_x; j++) {
-            //        var td = window.document.createElement("td");
-            //        td.id = i+','+j;
-            //        td.dataset.x = j;
-            //        td.dataset.y = i;
-            //        tr.appendChild(td);
-            //    }
-            //}
-            //getMapState();
+
         });
     }
-
-    function getMapState() {
-        //$.getJSON( "{{url_for('getMapState')}}", function( data ) {
-        //    for (var row in data) {
-        //        if (!data.hasOwnProperty(row))
-        //            continue;
-        //        
-        //        row = data[row];
-        //        for (var col in row) {
-        //            if (!data.hasOwnProperty(col))
-        //                continue;
-        //            
-        //            cell = row[col];
-        //            tileType = cell.tileType;
-
-        //            setClassByCoord(cell.x, cell.y, tileType.tileColor);
-        //        }
-        //    }
-        //    addClickListener();
-        //    isGameConfigured = true;
-        //});
-    }
-
 
 
 
@@ -206,7 +172,7 @@ setTimeout(function(){isGameConfigured=true;}, 1000);
                 var Cell = new Object();
                 Cell.x = 5;
                 Cell.y = 2;
-                setTimeout(function(){socket.emit('cell', {data: Cell});}, 5000);
+                setTimeout(function(){socket.emit('cell', {data: Cell});}, 1000);
 
         function parseData(updateDataArray) {
             for (updateDataStr of updateDataArray) {
@@ -233,8 +199,6 @@ setTimeout(function(){isGameConfigured=true;}, 1000);
                     moveUnit(unitType, id_num, startX, startY, deltaX, deltaY);
                 }
 
-                //var tileType = updateData.tileType;
-                //setClassByCoord(updateData.x, updateData.y, tileType.tileColor);
             }
         }
 
@@ -247,11 +211,51 @@ setTimeout(function(){isGameConfigured=true;}, 1000);
 
         function moveUnit(unitType, unitId, posX, posY, deltaX, deltaY) {
             var unitToMove = allUnits.unitId;
-            unitToMove.x = posX;
-            unitToMove.y = posY;
-            unitToMove.x += deltaX;
-            unitToMove.y += deltaY;
+            var tween = game.add.tween(unitToMove);
+            tween.to({ x: posX, y: posY }, 200, 'Linear', true, 0);
+            //game.physics.arcade.moveToXY(unitToMove, posX+deltaX, posY+deltaY, 50);
         }
-    </script>
 
+    </script>
+    <script>
+            //var tbody = window.document.getElementById("bodyTable");
+            //for(i=0; i<map_y; i++) {
+            //    var tr = window.document.createElement("tr");
+            //    tbody.appendChild(tr);
+            //    for(j=0; j<map_x; j++) {
+            //        var td = window.document.createElement("td");
+            //        td.id = i+','+j;
+            //        td.dataset.x = j;
+            //        td.dataset.y = i;
+            //        tr.appendChild(td);
+            //    }
+            //}
+            //getMapState();
+
+    function getMapState() {
+        //$.getJSON( "{{url_for('getMapState')}}", function( data ) {
+        //    for (var row in data) {
+        //        if (!data.hasOwnProperty(row))
+        //            continue;
+        //        
+        //        row = data[row];
+        //        for (var col in row) {
+        //            if (!data.hasOwnProperty(col))
+        //                continue;
+        //            
+        //            cell = row[col];
+        //            tileType = cell.tileType;
+
+        //            setClassByCoord(cell.x, cell.y, tileType.tileColor);
+        //        }
+        //    }
+        //    addClickListener();
+        //    isGameConfigured = true;
+        //});
+    }
+
+
+                //var tileType = updateData.tileType;
+                //setClassByCoord(updateData.x, updateData.y, tileType.tileColor);
+    </script>
 </html>
