@@ -66,8 +66,8 @@ class mainGamelogicThread(threading.Thread):
         self.allStructures.append(core1)
         self.allStructures.append(core2)
 
-        glob.the_map.placeObject(core1, 2, 10)
-        glob.the_map.placeObject(core2, 97, 10)
+        glob.the_map.placeObject(core1, 2, 5)
+        glob.the_map.placeObject(core2, 42, 5)
 
     def processPlayerRequest(self):
         while len(glob.all_requests) > 0:
@@ -105,8 +105,19 @@ class mainGamelogicThread(threading.Thread):
                 if clientState.canRefresh():
                     i+=1
                     print('sending to client', i)
-                    socketio.emit('baseMapUpdateResp', glob.all_updates)
-                    glob.all_updates = []
+                    #all_updatesList = list(glob.all_updates)
+                    #print(glob.all_updates)
+                    #print(all_updatesList)
+                    #all_updatesList.sort(key=lambda x: x.actionNum)
+                    #to_send = [creation for creation in glob.all_creation_updates] + all_updatesList
+                    print('-------------------------')
+                    to_send = glob.actionEventManager.getAllEvents()
+                    print(to_send)
+                    socketio.emit('baseMapUpdateResp', to_send)
+                    print('-------------------------')
+                    glob.actionEventManager.clearAllEvents()
+                    #glob.all_updates = set()
+                    #glob.all_creation_updates = set()
 
                 #process player request
                 self.processPlayerRequest()

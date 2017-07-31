@@ -10,6 +10,65 @@ import MapObjectDefinition
 
 cfg = glob.cfg
 
+class ActionEvent:
+    def __init__(self, action, curObject, coordXY):
+        self.action = action
+        self.name = curObject.name
+        self.id_num = curObject.id_num
+        self.actionNum = curObject.incActionNum()
+        self.coordXY = coordXY
+
+    def getUniqID(self):
+        return self.name+str(self.id_num)
+
+    def __repr__(self):
+        return MyEncoder().encode(self)
+
+class ActionEventManager:
+    def __init__(self):
+        self.construction_events = {}
+        self.move_events = {}
+
+    def add_construction_event(self, curObject, coordXY):
+        actionEvent = ActionEvent('placing', curObject, coordXY)
+        uniqID = actionEvent.getUniqID()
+        if uniqID in self.construction_events:
+            if self.construction_events[uniqID].actionNum < actionEvent.actionNum:
+                self.construction_events[uniqID] = actionEvent
+        else:
+            self.construction_events[uniqID] = actionEvent
+
+    def add_move_event(self, curObject, coordXY):
+        actionEvent = ActionEvent('moving', curObject, coordXY)
+        uniqID = actionEvent.getUniqID()
+        if uniqID in self.move_events:
+            if self.move_events[uniqID].actionNum < actionEvent.actionNum:
+                self.move_events[uniqID] = actionEvent
+        else:
+            self.move_events[uniqID] = actionEvent
+
+    def getAllEvents(self):
+        listConstructionEvents = []
+        for uniqID, event in self.construction_events.items():
+            listConstructionEvents.append(event)
+        listConstructionEvents.sort(key=lambda x: x.actionNum)
+
+        listMoveEvents = []
+        for uniqID, event in self.move_events.items():
+            listMoveEvents.append(event)
+        listMoveEvents.sort(key=lambda x: x.actionNum)
+
+        to_ret = listConstructionEvents + listMoveEvents
+        return MyEncoder().encode(to_ret)
+
+    def clearAllEvents(self):
+        self.construction_events = {}
+        self.move_events = {}
+        
+    def __repr__(self):
+        return MyEncoder().encode(self)
+
+
 class MyEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
@@ -18,6 +77,7 @@ class Map:
     def __init__(self):
         self.height = cfg.getint('map', 'height') #y
         self.width = cfg.getint('map', 'width') #x
+        self.squareSize = cfg.getint('map', 'squareSize')
         self.playerNum = cfg.getint('map', 'playerNum')
         self.playerWidthZone = cfg.getint('map', 'playerWidthZone')
 
@@ -51,9 +111,10 @@ class Map:
     
     def placeObject(self, objectToBePlaced, x, y):
         modif_obj = self.map[x][y].changeTileType(objectToBePlaced)
-        modif_obj = {'action': 'placing', 'name': objectToBePlaced.name, 'id_num': objectToBePlaced.id_num, 'x': x, 'y': y}
-        modif_obj_json = MyEncoder().encode(modif_obj)
-        glob.all_updates.append(modif_obj_json)
+        #modif_obj = {'action': 'placing', 'name': objectToBePlaced.name, 'id_num': objectToBePlaced.id_num, 'x': x, 'y': y}
+        #modif_obj_json = MyEncoder().encode(modif_obj)
+        glob.actionEventManager.add_construction_event(objectToBePlaced, (x, y))
+        #glob.all_creation_updates.add(modif_obj_json)
 
     def moveObject(self, objectToMove, deltaX=1, deltaY=0):
         startX = objectToMove.posX
@@ -63,13 +124,17 @@ class Map:
         modif_emptyObj_json = MyEncoder().encode(modif_emptyObj)
         #glob.all_updates.append(modif_emptyObj_json)
 
-        modif_obj = self.map[startX+deltaX][startY+deltaY].changeTileType(objectToMove)
-        modif_obj = {'action': 'moving', 'name': objectToMove.name, 'id_num': objectToMove.id_num, 'startX': startX, 'startY': startY, 'deltaX': deltaX, 'deltaY': deltaY}
-        modif_obj_json = MyEncoder().encode(modif_obj)
-        glob.all_updates.append(modif_obj_json)
+        endX = startX + deltaX
+        endY = startY + deltaY
+        if endX > self.width or endY > self.height:
+            print('moveOutOfBound')
+            return
+        self.map[endX][endY].changeTileType(objectToMove)
+        glob.actionEventManager.add_move_event(objectToMove, (endX, endY))
+        #modif_obj_json = MyEncoder().encode(modif_obj)
+        #glob.all_updates.add(action)
 
         
-
     def __repr__(self):
         return MyEncoder().encode(self.map)
         #return json.dumps(self.map)

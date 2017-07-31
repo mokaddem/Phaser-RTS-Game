@@ -24,8 +24,11 @@ cfg = glob.cfg
 
 all_requests = []
 glob.all_requests = all_requests
-all_updates = []
+all_updates = set()
 glob.allupdates = all_updates
+all_creation_updates = set()
+glob.all_creation_updates = all_creation_updates
+
 
 @app.route('/')
 def index():
@@ -42,6 +45,7 @@ def getGameConfiguration():
     gameConf = {}
     gameConf['width'] = cfg.getint('map', 'width') #x 
     gameConf['height'] = cfg.getint('map', 'height') #y
+    gameConf['squareSize'] = cfg.getint('map', 'squareSize') #y
     gameConf['playerNum'] = cfg.getint('map', 'playerNum')
     return jsonify(gameConf)
 
@@ -75,6 +79,7 @@ def test_connect():
 
 def main():
     glob.the_map = MapDefinition.Map()
+    glob.actionEventManager = MapDefinition.ActionEventManager()
 
     mainGamelogic = mainGamelogicThread("gameLogic")
     mainGamelogic.start()
