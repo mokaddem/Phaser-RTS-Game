@@ -20,7 +20,6 @@ class Map:
         self.playerWidthZone = cfg.getint('map', 'playerWidthZone')
 
         #Create map tiles
-        #self.map = [[0 for y in range(self.height)] for x in range(self.width)]
         self.map = {}
         for x in range(self.width):
             self.map[x] = {}
@@ -49,10 +48,7 @@ class Map:
     
     def placeObject(self, objectToBePlaced, x, y):
         modif_obj = self.map[x][y].changeTileType(objectToBePlaced)
-        #modif_obj = {'action': 'placing', 'name': objectToBePlaced.name, 'id_num': objectToBePlaced.id_num, 'x': x, 'y': y}
-        #modif_obj_json = MyEncoder().encode(modif_obj)
         glob.actionEventManager.add_construction_event(objectToBePlaced, (x, y))
-        #glob.all_creation_updates.add(modif_obj_json)
 
     def moveObject(self, objectToMove, deltaX=1, deltaY=0):
         startX = objectToMove.posX
@@ -60,23 +56,19 @@ class Map:
         emptyObject = MapTile(startX, startY, isPlayerZone=self.isCoordInPlayerZone(startX, startY))
         modif_emptyObj = self.map[startX][startY].changeTileType(emptyObject.tileType)
         modif_emptyObj_json = MyEncoder().encode(modif_emptyObj)
-        #glob.all_updates.append(modif_emptyObj_json)
 
         endX = startX + deltaX
         endY = startY + deltaY
-        print(self.width)
+
         if endX >= self.width-1 or endY >= self.height-1:
             print('moveOutOfBound')
             glob.actionEventManager.add_kill_event(objectToMove)
         self.map[endX][endY].changeTileType(objectToMove)
         glob.actionEventManager.add_move_event(objectToMove, (endX, endY))
-        #modif_obj_json = MyEncoder().encode(modif_obj)
-        #glob.all_updates.add(action)
 
         
     def __repr__(self):
         return MyEncoder().encode(self.map)
-        #return json.dumps(self.map)
 
 
 class MapTile:
@@ -89,7 +81,6 @@ class MapTile:
 
     def __repr__(self):
         return MyEncoder().encode(self.tileType)
-        #return json.dumps(self.tileType)
 
     def getTileState(self):
         return { 'tileType': self.tileType, 'x': self.x, 'y': self.y }
@@ -114,5 +105,4 @@ class TileType:
 
     def __repr__(self):
         return MyEncoder().encode(self.tileColor)
-        #return json.dumps(self.tileColor)
 

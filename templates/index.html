@@ -82,10 +82,6 @@
             getGameConfiguration();
         });
 
-        socket.on('msg', function(data) {
-            console.log(data);
-        });
-
         socket.on('baseMapUpdateResp', function(updateData) {
             if (isGameConfigured) {
                 parseData(updateData);
@@ -123,8 +119,6 @@
             map_x = data.width * data.squareSize;
             map_y = data.height * data.squareSize;
             map_squareSize = data.squareSize;
-            //unitSpeedRefresh = data.unitSpeedRefresh;
-            unitSpeedRefresh = 500;
             playerNum = data.playerNum;
 
             game = new Phaser.Game(map_x, map_y, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update, render: render });
@@ -139,14 +133,6 @@
             
             function create() {
                 //  We're going to be using physics, so enable the Arcade Physics system
-                //game.physics.startSystem(Phaser.Physics.ARCADE);
-            
-                //  A simple background for our game
-                //map = game.add.sprite(0, 0, 'ground');
-                //map.height = game.height;
-                //map.width = game.width;
-                //map.smoothed = false;
-
                 game.physics.startSystem(Phaser.Physics.ARCADE);
                 game.stage.backgroundColor = "#a9f0ff";
                 map = game.add.tilemap('tilemap');
@@ -154,6 +140,7 @@
                 backgroundLayer = map.createLayer('BackgroundLayer');
                 layer = map.createLayer('GroundLayer');
                 layer.resizeWorld();
+
                 //  Our painting marker
                 marker = game.add.graphics();
                 marker.lineStyle(2, 0xffffff, 1);
@@ -184,32 +171,10 @@
 
         });
     }
-
-
-
     </script>
 
 
     <script>
-        function setClassByCoord(x, y, className) {
-            var td = window.document.getElementById(y+','+x);
-            td.className = className;
-        }
-
-
-
-    </script>
-
-    <script>
-        function addClickListener() {
-            $( ".playerzone" ).click(function() {
-                clickedCell = $( this );
-                var Cell = new Object();
-                Cell.x = clickedCell.data('x');
-                Cell.y = clickedCell.data('y');
-                socket.emit('cell', {data: Cell});
-            });
-        }
 
         function onMapClick(){
             var x = layer.getTileX(game.input.activePointer.worldX);
@@ -232,17 +197,14 @@
             for (update of updateData) {
                 var action = update.action;
                 var name = update.name;
-                //var unitType = updateData.unitType;
                 var unitType = name;
                 var id_num = update.id_num;
                 var x = update.coordXY[0];
                 var y = update.coordXY[1];
                 
                 if (action == 'placing') {
-                    console.log(name+id_num+' '+x+', '+y);
                     createUnit(unitType, id_num, x, y);
                 } else if (action == 'moving') {
-                    //console.log(name+id_num+' '+startX+'->'+endX+', '+startY+'->'+endY);
                     moveUnit(unitType, id_num, x, y);
                 } else if (action == 'kill') {
                     killUnit(unitType, id_num)
@@ -267,12 +229,8 @@
             var speed = unitConfig[unitType].speed;
             var unitToMove = allUnits[unitType][unitId];
             var tween = game.add.tween(unitToMove);
-            //tween.to({ x: posX, y: posY }, unitSpeedRefresh, 'Linear', true, 0);
             if (Math.abs(unitToMove.x - endX*map_squareSize) > map_squareSize*2 || Math.abs(unitToMove.y - endY*map_squareSize) > map_squareSize*2) {
                 tween.to({ x: endX*map_squareSize, y: endY*map_squareSize }, 1000, 'Linear', true, 0);
-                //tween.to({ x: posX*map_squareSize+deltaX*map_squareSize, y: posY*map_squareSize+deltaY*map_squareSize }, unitSpeedRefresh, 'Linear', true, 0);
-                //game.physics.arcade.moveToXY(unitToMove, endX*map_squareSize, endY*map_squareSize, 0, 333);
-                //unitToMove.x = endX*map_squareSize;
                 console.log(unitType+unitId+' to slow. ' + endX*map_squareSize + ', ' + unitToMove.x);
             } else {
                 unitToMove.body.velocity.x = speed;
@@ -289,45 +247,5 @@
         }
 
     </script>
-    <script>
-            //var tbody = window.document.getElementById("bodyTable");
-            //for(i=0; i<map_y; i++) {
-            //    var tr = window.document.createElement("tr");
-            //    tbody.appendChild(tr);
-            //    for(j=0; j<map_x; j++) {
-            //        var td = window.document.createElement("td");
-            //        td.id = i+','+j;
-            //        td.dataset.x = j;
-            //        td.dataset.y = i;
-            //        tr.appendChild(td);
-            //    }
-            //}
-            //getMapState();
 
-    function getMapState() {
-        //$.getJSON( "{{url_for('getMapState')}}", function( data ) {
-        //    for (var row in data) {
-        //        if (!data.hasOwnProperty(row))
-        //            continue;
-        //        
-        //        row = data[row];
-        //        for (var col in row) {
-        //            if (!data.hasOwnProperty(col))
-        //                continue;
-        //            
-        //            cell = row[col];
-        //            tileType = cell.tileType;
-
-        //            setClassByCoord(cell.x, cell.y, tileType.tileColor);
-        //        }
-        //    }
-        //    addClickListener();
-        //    isGameConfigured = true;
-        //});
-    }
-
-
-                //var tileType = updateData.tileType;
-                //setClassByCoord(updateData.x, updateData.y, tileType.tileColor);
-    </script>
 </html>

@@ -105,25 +105,12 @@ class mainGamelogicThread(threading.Thread):
 
         print("game started")
 
-        i=0
         while not glob.gameFinished:
             if serverState.canRefresh():
                 if clientState.canRefresh():
-                    i+=1
-                    print('sending to client', i)
-                    #all_updatesList = list(glob.all_updates)
-                    #print(glob.all_updates)
-                    #print(all_updatesList)
-                    #all_updatesList.sort(key=lambda x: x.actionNum)
-                    #to_send = [creation for creation in glob.all_creation_updates] + all_updatesList
-                    print('-------------------------')
                     to_send = glob.actionEventManager.getAllEvents()
-                    print(to_send)
                     socketio.emit('baseMapUpdateResp', to_send)
-                    print('-------------------------')
                     glob.actionEventManager.clearAllEvents()
-                    #glob.all_updates = set()
-                    #glob.all_creation_updates = set()
 
                 #process player request
                 self.processPlayerRequest()

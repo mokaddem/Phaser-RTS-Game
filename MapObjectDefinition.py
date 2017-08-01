@@ -121,7 +121,6 @@ class Unit(DestructableMapObject):
         glob.the_map.moveObject(self, deltaX=int(dx), deltaY=int(dy))
         self.posX = int(self.floatPosX)
         self.posY = int(self.floatPosY)
-        print('speed', dx)
 
     def behave(self):
         if self.ennemyUnitInRange():

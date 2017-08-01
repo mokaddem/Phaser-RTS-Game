@@ -17,7 +17,6 @@ eventlet.monkey_patch()
 
 app = Flask(__name__, static_url_path='/static/')
 glob.app = app
-#socketio = SocketIO(app)
 socketio = SocketIO(app, message_queue='redis://')
 glob.socketio = socketio
 
