@@ -8,7 +8,10 @@ import settings as glob
 cfg = glob.cfg
 
 class MapObject:
+    globalID = 0
     def __init__(self, height=1, width=1, squareSize=15, name="MapObject", posX=0, posY=0):
+        self.globalID = MapObject.globalID
+        MapObject.globalID += 1
         self.height = height #y
         self.width = width #x
         self.squareSize = cfg.getint('map', 'squareSize')

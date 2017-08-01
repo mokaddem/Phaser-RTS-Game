@@ -151,7 +151,7 @@
                 game.physics.startSystem(Phaser.Physics.ARCADE);
                 game.stage.backgroundColor = "#a9f0ff";
                 map = game.add.tilemap('tilemap');
-                map.addTilesetImage('tiles32', 'tiles');
+                map.addTilesetImage('gridtiles', 'tiles');
                 backgroundLayer = map.createLayer('BackgroundLayer');
                 layer = map.createLayer('GroundLayer');
                 layer.resizeWorld();
@@ -214,8 +214,6 @@
             var tile = map.getTile(x, y, layer);
 
             var Cell = new Object();
-            //Cell.x = x*map_squareSize;
-            //Cell.y = y*map_squareSize;
             Cell.x = x;
             Cell.y = y;
             socket.emit('cell', {data: Cell});
@@ -243,6 +241,8 @@
                 } else if (action == 'moving') {
                     //console.log(name+id_num+' '+startX+'->'+endX+', '+startY+'->'+endY);
                     moveUnit(unitType, id_num, x, y);
+                } else if (action == 'kill') {
+                    killUnit(unitType, id_num)
                 }
 
             }
@@ -278,6 +278,12 @@
                 //game.physics.arcade.moveToXY(unitToMove, endX*map_squareSize, endY*map_squareSize, speed);
                 //unitToMove.x = endX*map_squareSize;
             }
+        }
+
+        function killUnit(unitType, id_num) {
+            var unitToKill = allUnits[unitType][id_num];
+            console.log('killed '+unitType+id_num);
+            unitToKill.kill();
         }
 
     </script>

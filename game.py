@@ -49,10 +49,6 @@ def getGameConfiguration():
     gameConf['playerNum'] = cfg.getint('map', 'playerNum')
     return jsonify(gameConf)
 
-#@socketio.on('baseMapUpdate')
-#def handle_baseMapUpdate(receivedJson):
-#    global all_updates
-
 @socketio.on('cell')
 def handle_cell(receivedJson):
     print('received json: ' + str(receivedJson))

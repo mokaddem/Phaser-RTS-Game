@@ -52,7 +52,7 @@ class mainGamelogicThread(threading.Thread):
         threading.Thread.__init__(self)
         self.name = name
 
-        self.allUnits = []
+        self.allUnits = {}
         self.allStructures = []
 
     def run(self):
@@ -77,16 +77,21 @@ class mainGamelogicThread(threading.Thread):
                 y = request.y
                 if request.theType == 'meleUnit':
                     unit = MapObjectDefinition.MeleUnit(player=1, posX=x, posY=y)
-                    self.allUnits.append(unit)
+                    self.allUnits[unit.globalID] = unit
                     glob.the_map.placeObject(unit, x, y)
                     print('MeleUnit created and placed')
                 elif request.theType == 'rangedUnit':
                     unit = MapObjectDefinition.RangedUnit(player=1, posX=x, posY=y)
-                    self.allUnits.append(unit)
+                    self.allUnits[unit.globalID] = unit
                     glob.the_map.placeObject(unit, x, y)
 
     def executeGameLogic(self):
-        for unit in self.allUnits:
+        #kill all dead unit
+        for globalID in glob.actionEventManager.getAndClearKilledUnit():
+            self.allUnits.pop(globalID, None)
+
+        #make valid unit behave
+        for globalID, unit in self.allUnits.items():
             unit.behave()
 
     def start_main_loop(self):

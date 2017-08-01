@@ -11,7 +11,7 @@ import MapObjectDefinition
 cfg = glob.cfg
 
 class ActionEvent:
-    def __init__(self, action, curObject, coordXY):
+    def __init__(self, action, curObject, coordXY=(0, 0)):
         self.action = action
         self.name = curObject.name
         self.id_num = curObject.id_num
@@ -28,6 +28,8 @@ class ActionEventManager:
     def __init__(self):
         self.construction_events = {}
         self.move_events = {}
+        self.kill_events = {}
+        self.IDToKill = []
 
     def add_construction_event(self, curObject, coordXY):
         actionEvent = ActionEvent('placing', curObject, coordXY)
@@ -38,7 +40,13 @@ class ActionEventManager:
         else:
             self.construction_events[uniqID] = actionEvent
 
-    def add_move_event(self, curObject, coordXY):
+    def add_kill_event(self, curObject):
+        actionEvent = ActionEvent('kill', curObject)
+        uniqID = actionEvent.getUniqID()
+        self.kill_events[uniqID] = actionEvent
+        self.IDToKill.append(curObject.globalID)
+
+    def add_move_event(self, curObject, coordXY): #FIXME reset position every x seconds OR when other event occur
         actionEvent = ActionEvent('moving', curObject, coordXY)
         uniqID = actionEvent.getUniqID()
         if uniqID in self.move_events:
@@ -46,6 +54,12 @@ class ActionEventManager:
                 self.move_events[uniqID] = actionEvent
         else:
             self.move_events[uniqID] = actionEvent
+
+    def getAndClearKilledUnit(self):
+        temp = self.IDToKill
+        self.IDToKill = []
+        return temp
+
 
     def getAllEvents(self):
         listConstructionEvents = []
@@ -58,12 +72,18 @@ class ActionEventManager:
             listMoveEvents.append(event)
         listMoveEvents.sort(key=lambda x: x.actionNum)
 
-        to_ret = listConstructionEvents + listMoveEvents
+        listKillEvents = []
+        for uniqID, event in self.kill_events.items():
+            listKillEvents.append(event)
+        listKillEvents.sort(key=lambda x: x.actionNum)
+
+        to_ret = listConstructionEvents + listMoveEvents + listKillEvents
         return MyEncoder().encode(to_ret)
 
     def clearAllEvents(self):
         self.construction_events = {}
         self.move_events = {}
+        self.kill_events = {}
         
     def __repr__(self):
         return MyEncoder().encode(self)
@@ -126,9 +146,10 @@ class Map:
 
         endX = startX + deltaX
         endY = startY + deltaY
-        if endX > self.width or endY > self.height:
+        print(self.width)
+        if endX >= self.width-1 or endY >= self.height-1:
             print('moveOutOfBound')
-            return
+            glob.actionEventManager.add_kill_event(objectToMove)
         self.map[endX][endY].changeTileType(objectToMove)
         glob.actionEventManager.add_move_event(objectToMove, (endX, endY))
         #modif_obj_json = MyEncoder().encode(modif_obj)
