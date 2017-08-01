@@ -9,6 +9,7 @@ from flask_socketio import SocketIO, emit, send
 import settings as glob
 import MapObjectDefinition
 import MapDefinition
+from utils import ActionEvent, ActionEventManager, Player
 from gameLogic import mainGamelogicThread, PlayerRequest
 
 import eventlet
@@ -24,10 +25,6 @@ cfg = glob.cfg
 
 all_requests = []
 glob.all_requests = all_requests
-all_updates = set()
-glob.allupdates = all_updates
-all_creation_updates = set()
-glob.all_creation_updates = all_creation_updates
 
 
 @app.route('/')
@@ -70,10 +67,19 @@ def test_disconnect():
 @socketio.on('connect')
 def test_connect():
     print('Client connected')
+
+@socketio.on('gameReady')
+def gameReady(receivedJson):
+    glob.players[0].setReady()
+    glob.players[1].setReady()
+
+    for player in glob.players:
+        if not player.isReady():
+            return 
     glob.startGame = True
 
-
 def main():
+    glob.players = [Player(i) for i in range(cfg.getint('map' ,'playerNum'))]
     glob.the_map = MapDefinition.Map()
     glob.actionEventManager = MapDefinition.ActionEventManager()
 

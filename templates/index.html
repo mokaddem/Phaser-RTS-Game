@@ -116,7 +116,6 @@
     }
     var playerNum = 2;
     var isGameConfigured = false;
-    setTimeout(function(){isGameConfigured=true;}, 1000);
     var allUnits = new Object();
 
     function getGameConfiguration() {
@@ -169,6 +168,10 @@
                 units.enableBody = true;
                 units.setAll('anchor.x', 0.5);
                 units.setAll('anchor.y', 0.5);
+
+                // tell server game is ready
+                socket.emit('gameReady', {ready: true});
+                isGameConfigured = true;
 
             }
             
@@ -273,7 +276,6 @@
                 console.log(unitType+unitId+' to slow. ' + endX*map_squareSize + ', ' + unitToMove.x);
             } else {
                 unitToMove.body.velocity.x = speed;
-                //tween.to({ x: endX*map_squareSize, y: endY*map_squareSize }, unitSpeedRefresh, 'Linear', true, 0);
                 //tween.to({ x: endX*map_squareSize, y: endY*map_squareSize }, 1000, 'Linear', true, 0);
                 //game.physics.arcade.moveToXY(unitToMove, endX*map_squareSize, endY*map_squareSize, speed);
                 //unitToMove.x = endX*map_squareSize;

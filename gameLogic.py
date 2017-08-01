@@ -11,6 +11,7 @@ import time
 import settings as glob
 import MapObjectDefinition
 import MapDefinition
+from utils import ActionEvent, ActionEventManager
 
 cfg = glob.cfg
 socketio = SocketIO(message_queue='redis://')
@@ -66,8 +67,8 @@ class mainGamelogicThread(threading.Thread):
         self.allStructures.append(core1)
         self.allStructures.append(core2)
 
-        glob.the_map.placeObject(core1, 2, 5)
-        glob.the_map.placeObject(core2, 42, 5)
+        glob.the_map.placeObject(core1, 1, 5)
+        glob.the_map.placeObject(core2, 43, 5)
 
     def processPlayerRequest(self):
         while len(glob.all_requests) > 0:
