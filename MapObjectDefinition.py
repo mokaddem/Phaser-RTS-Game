@@ -75,7 +75,7 @@ class Core(Structure):
         width = cfg.getint('structure.core', 'width')
         lifePoint = cfg.getint('structure.core', 'lifePoint')
         
-        self.name = "Core"
+        self.name = "core"
         self.setTileColor('core')
 
 

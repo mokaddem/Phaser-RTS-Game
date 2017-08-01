@@ -113,6 +113,9 @@
     var playerNum = 2;
     var isGameConfigured = false;
     var allUnits = new Object();
+    var allStructs = new Object();
+    var units;
+    var structs;
 
     function getGameConfiguration() {
         $.getJSON( "{{url_for('getGameConfiguration')}}", function( data ) {
@@ -124,9 +127,11 @@
             game = new Phaser.Game(map_x, map_y, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update, render: render });
             
             function preload() {
-                game.load.image('ground', '{{url_for("static", filename="images/map.png")}}');
+                //game.load.image('ground', '{{url_for("static", filename="images/map.png")}}');
                 game.load.spritesheet('knight', '{{url_for("static", filename="images/mummy.png")}}', 37, 45, 18);
                 game.load.spritesheet('canon', '{{url_for("static", filename="images/monster.png")}}', 39, 40, 16);
+                game.load.atlasJSONHash('cores', '{{url_for("static", filename="images/cores.png")}}', '{{url_for("static", filename="images/cores.json")}}');
+
                 game.load.tilemap('tilemap', '{{url_for("static", filename="images/levelCSV.json")}}', null, Phaser.Tilemap.TILED_JSON);
                 game.load.image('tiles', '{{url_for("static", filename="images/gridtiles.png")}}');
             }
@@ -155,6 +160,12 @@
                 units.enableBody = true;
                 units.setAll('anchor.x', 0.5);
                 units.setAll('anchor.y', 0.5);
+
+                // Struct group
+                structs = game.add.group();
+                structs.enableBody = true;
+                //structs.setAll('anchor.x', 0.5);
+                //structs.setAll('anchor.y', 0.5);
 
                 // tell server game is ready
                 socket.emit('gameReady', {ready: true});
@@ -203,7 +214,11 @@
                 var y = update.coordXY[1];
                 
                 if (action == 'placing') {
-                    createUnit(unitType, id_num, x, y);
+                    if (unitType == 'core') {
+                        createStructure(unitType+'s', id_num, x, y, Object.keys(allStructs).length);
+                    } else {
+                        createUnit(unitType, id_num, x, y);
+                    }
                 } else if (action == 'moving') {
                     moveUnit(unitType, id_num, x, y);
                 } else if (action == 'kill') {
@@ -213,10 +228,28 @@
             }
         }
 
+        function createStructure(structType, structId, posX, posY, player) {
+            var color;
+            if (player == 0) {
+                color = 'redCore/';
+            } else {
+                color = 'blueCore/';
+            }
+            var newStruct = structs.create(posX*map_squareSize, posY*map_squareSize, 'cores', color+'0001.png');
+            newStruct.width = 32*2;
+            newStruct.height = 32*2;
+            newStruct.animations.add('powerOn', Phaser.Animation.generateFrameNames(color, 1, 2, '.png', 4), 3, true, false);
+            newStruct.animations.play('powerOn');
+            if (!(structType in allStructs)) {
+                allStructs[structType] = new Object();
+            }
+            allStructs[structType][structId] = newStruct;
+        }
+
         function createUnit(unitType, unitId, posX, posY) {
             var newUnit = units.create(posX*map_squareSize, posY*map_squareSize, unitType);
-            newUnit.width = 15;
-            newUnit.height = 30;
+            newUnit.width = 16;
+            newUnit.height = 32;
             newUnit.animations.add('walk');
             newUnit.animations.play('walk', 10, true);
             if (!(unitType in allUnits)) {

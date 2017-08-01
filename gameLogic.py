@@ -67,8 +67,8 @@ class mainGamelogicThread(threading.Thread):
         self.allStructures.append(core1)
         self.allStructures.append(core2)
 
-        glob.the_map.placeObject(core1, 1, 5)
-        glob.the_map.placeObject(core2, 43, 5)
+        glob.the_map.placeObject(core1, 1, 4)
+        glob.the_map.placeObject(core2, 42, 4)
 
     def processPlayerRequest(self):
         while len(glob.all_requests) > 0:
