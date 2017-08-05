@@ -1,4 +1,9 @@
 from json import JSONEncoder
+import flask_login
+
+
+class User(flask_login.UserMixin):
+    pass
 
 class MyEncoder(JSONEncoder):
     def default(self, o):
@@ -84,9 +89,12 @@ class ActionEventManager:
 
 
 class Player:
+    ID = 0
     def __init__(self, num):
         self.num = num
         self.ready = False
+        self.id = Player.ID
+        Player.ID += 1
 
     def setReady(self):
         self.ready = True

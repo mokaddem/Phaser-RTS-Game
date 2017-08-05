@@ -111,6 +111,7 @@
         canon: { size: {x:39, y:40}, speed: 0.7*32.0}, 
     }
     var playerNum = 2;
+    var playerID;
     var isGameConfigured = false;
     var allUnits = new Object();
     var allStructs = new Object();
@@ -123,6 +124,7 @@
             map_y = data.height * data.squareSize;
             map_squareSize = data.squareSize;
             playerNum = data.playerNum;
+            playerID = data.playerID;
 
             game = new Phaser.Game(map_x, map_y, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update, render: render });
             
@@ -195,6 +197,7 @@
             var Cell = new Object();
             Cell.x = x;
             Cell.y = y;
+            Cell.playerID = playerID;
             socket.emit('cell', {data: Cell});
         }
 
