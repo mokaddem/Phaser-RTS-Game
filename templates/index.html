@@ -65,32 +65,35 @@
     </body>
 
     <script>
-        socket = io.connect('192.168.0.7:9000');
-        //socket = io.connect('localhost:9000');
-        //socket = io.connect('http://' + document.domain + ':' + location.port);
-        //var socket = io.connect('localhost:9000');
-        socket.on('serverRep', function(msg) {
-            console.log(msg);
-        });
-        socket.on('disconnect', function() {
-            console.log("/!\ CLIENT DISCONNECTED /!\ ")
-        });
-
-        socket.on('connect', function(socket) {
-            console.log('connected');
-            getGameConfiguration();
-        });
-
-        socket.on('baseMapUpdateResp', function(updateData) {
-            if (isGameConfigured) {
-                parseData(updateData);
-            } else {
-                console.log('Update received but game not configured yet')
-            }
-        });
-
         $( document ).ready(function(){
             console.log('doc ready');
+
+            //socket = io.connect('192.168.0.7:9000');
+            //socket = io.connect('localhost:9000');
+            //socket = io.connect('http://' + document.domain + ':' + location.port);
+            //var socket = io.connect('localhost:9000');
+            socket = io.connect();
+            socket.on('serverRep', function(msg) {
+                console.log(msg);
+            });
+            socket.on('disconnect', function() {
+                console.log("/!\ CLIENT DISCONNECTED /!\ ")
+            });
+    
+            socket.on('connect', function(socket) {
+                console.log('connected');
+                getGameConfiguration();
+            });
+    
+            socket.on('baseMapUpdateResp', function(updateData) {
+                if (isGameConfigured) {
+                    parseData(updateData);
+                } else {
+                    console.log('Update received but game not configured yet')
+                }
+            });
+
+
         });
     </script>
 

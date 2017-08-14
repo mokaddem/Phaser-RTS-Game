@@ -32,9 +32,14 @@ all_requests = []
 glob.all_requests = all_requests
 
 
+@flask_login.login_required
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if flask_login.current_user.is_authenticated:
+        return render_template('index.html')
+    else:
+        return flask.redirect(flask.url_for('login'))
+
 
 @app.route("/getMapState/")
 def getMapState():
@@ -75,8 +80,8 @@ def test_connect():
 
 @socketio.on('gameReady')
 def gameReady(receivedJson):
-    glob.players[0].setReady()
-    glob.players[1].setReady()
+    curUser = flask_login.current_user
+    glob.players[curUser.playerNum].setReady()
 
     for player in glob.players:
         if not player.isReady():
@@ -85,12 +90,15 @@ def gameReady(receivedJson):
 
 @glob.login_manager.user_loader
 def user_loader(username):
-    if username not in users:
+    try:
+        if username not in users:
+            return
+        user = User()
+        user.id = username
+        user.loadUser(glob.usernameToPlayer[username])
+        return user
+    except:
         return
-    user = User()
-    user.id = username
-    user.loadUser(glob.usernameToPlayer[username])
-    return user
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -119,7 +127,7 @@ def login():
             user.id = username
             glob.usernameToPlayer[username] = player_to_be_attributed
             flask_login.login_user(user)
-            return flask.redirect(flask.url_for('protected'))
+            return flask.redirect(flask.url_for('index'))
 
     except KeyError:
         return flask.redirect(flask.url_for('unprotected'))
