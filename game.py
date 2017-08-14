@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 import json
 import time
@@ -24,7 +24,7 @@ socketio = SocketIO(app, message_queue='redis://')
 glob.socketio = socketio
 glob.login_manager = flask_login.LoginManager()
 glob.login_manager.init_app(app)
-users = {'foo@bar.tld': {'pw': 'secret'}}
+users = {'user1': {'password': 'pass'}, 'user2': {'password': 'pass'}}
 
 cfg = glob.cfg
 
@@ -84,23 +84,12 @@ def gameReady(receivedJson):
     glob.startGame = True
 
 @glob.login_manager.user_loader
-def user_loader(email):
-    if email not in users:
+def user_loader(username):
+    if username not in users:
         return
     user = User()
-    user.id = email
-    return user
-
-@glob.login_manager.request_loader
-def request_loader(request):
-    email = request.form.get('foo@bar.tld')
-    if email not in users:
-        return
-    user = User()
-    user.id = email
-    # DO NOT ever store passwords in plaintext and always compare password
-    # hashes using constant-time comparison!
-    user.is_authenticated = 'secret' == users[email]['pw']
+    user.id = username
+    user.loadUser(glob.usernameToPlayer[username])
     return user
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -108,26 +97,37 @@ def login():
     if request.method == 'GET':
         return '''
                <form action='login' method='POST'>
-                <input type='text' name='email' id='email' placeholder='email'></input>
-                <input type='password' name='pw' id='pw' placeholder='password'></input>
+                <input type='text' name='username' id='username' placeholder='username'></input>
+                <input type='password' name='password' id='password' placeholder='password'></input>
                 <input type='submit' name='submit'></input>
                </form>
                '''
 
-    email = request.form['email']
+    username = request.form['username']
     try:
-        if request.form['pw'] == users[email]['pw']:
+        if request.form['password'] == users[username]['password']:
             user = User()
-            user.id = email
+
+            #Attribute this user to a player object
+            player_to_be_attributed = None
+            for player in glob.players:
+                if not player.isAttributed():
+                    player_to_be_attributed = player
+                    break
+            player_to_be_attributed.attribute()
+
+            user.id = username
+            glob.usernameToPlayer[username] = player_to_be_attributed
             flask_login.login_user(user)
             return flask.redirect(flask.url_for('protected'))
+
     except KeyError:
         return flask.redirect(flask.url_for('unprotected'))
 
 @app.route('/protected')
 @flask_login.login_required
 def protected():
-    return 'Logged in as: ' + flask_login.current_user.id
+    return 'Logged in as: {}, player number: {}'.format(flask_login.current_user.id, flask_login.current_user.playerNum)
 
 @app.route('/unprotected')
 def unprotected():

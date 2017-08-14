@@ -3,7 +3,17 @@ import flask_login
 
 
 class User(flask_login.UserMixin):
-    pass
+    def __init__(self, *args, **kwargs):
+        self.playerNum = None
+        self.player = None
+        super(User, self).__init__(*args, **kwargs)
+
+    def loadUser(self, player):
+        self.player = player
+        self.playerNum = player.num
+
+    def __repr__(self):
+        return str(self.__dict__)
 
 class MyEncoder(JSONEncoder):
     def default(self, o):
@@ -95,9 +105,19 @@ class Player:
         self.ready = False
         self.id = Player.ID
         Player.ID += 1
+        self.attributed = False
 
     def setReady(self):
         self.ready = True
 
     def isReady(self):
         return self.ready
+
+    def isAttributed(self):
+        return self.attributed
+
+    def attribute(self):
+        self.attributed = True
+    
+    def __repr__(self):
+        return str(self.__dict__)

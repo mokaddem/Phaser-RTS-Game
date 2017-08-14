@@ -13,6 +13,7 @@ login_manager = None
 startGame = False
 gameFinished = False
 players = []
+usernameToPlayer = {}
 the_map = {}
 all_requests = []
 all_updates = set()

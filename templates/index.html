@@ -65,11 +65,10 @@
     </body>
 
     <script>
-        //socket = io.connect('192.168.0.7:9000');
+        socket = io.connect('192.168.0.7:9000');
         //socket = io.connect('localhost:9000');
         //socket = io.connect('http://' + document.domain + ':' + location.port);
         //var socket = io.connect('localhost:9000');
-        var socket = io.connect('localhost:9000');
         socket.on('serverRep', function(msg) {
             console.log(msg);
         });
