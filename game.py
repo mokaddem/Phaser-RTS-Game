@@ -41,19 +41,23 @@ def index():
         return flask.redirect(flask.url_for('login'))
 
 
+@flask_login.login_required
 @app.route("/getMapState/")
 def getMapState():
     the_state = glob.the_map.getJsonMapState()
     return the_state
     #return jsonify(the_state)
 
+@flask_login.login_required
 @app.route("/getGameConfiguration/")
 def getGameConfiguration():
+    curUser = flask_login.current_user
     gameConf = {}
     gameConf['width'] = cfg.getint('map', 'width') #x 
     gameConf['height'] = cfg.getint('map', 'height') #y
     gameConf['squareSize'] = cfg.getint('map', 'squareSize') #y
     gameConf['playerNum'] = cfg.getint('map', 'playerNum')
+    gameConf['playerID'] = curUser.playerNum
     return jsonify(gameConf)
 
 @socketio.on('cell')
