@@ -4,13 +4,13 @@ import flask_login
 
 class User(flask_login.UserMixin):
     def __init__(self, *args, **kwargs):
-        self.playerNum = None
+        self.playerID = None
         self.player = None
         super(User, self).__init__(*args, **kwargs)
 
     def loadUser(self, player):
         self.player = player
-        self.playerNum = player.num
+        self.playerID = player.num
 
     def __repr__(self):
         return str(self.__dict__)

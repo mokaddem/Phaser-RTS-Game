@@ -35,9 +35,10 @@ class refreshState():
 
 
 class PlayerRequest():
-    def __init__(self, ObjectType, theType, x=0, y=0):
+    def __init__(self, ObjectType, theType, playerID, x=0, y=0):
         self.ObjectType = ObjectType
         self.theType = theType
+        self.playerID = playerID
         self.x = x
         self.y = y
 
@@ -76,15 +77,20 @@ class mainGamelogicThread(threading.Thread):
             if request.isUnitRequest():
                 x = request.x
                 y = request.y
-                if request.theType == 'meleUnit':
-                    unit = MapObjectDefinition.MeleUnit(player=1, posX=x, posY=y)
+                playerID = request.playerID
+                if playerID == 0:
+                #if request.theType == 'meleUnit':
+                    unit = MapObjectDefinition.MeleUnit(playerID, posX=x, posY=y)
                     self.allUnits[unit.globalID] = unit
                     glob.the_map.placeObject(unit, x, y)
-                    print('MeleUnit created and placed')
-                elif request.theType == 'rangedUnit':
-                    unit = MapObjectDefinition.RangedUnit(player=1, posX=x, posY=y)
+                    print('Player 0 created a unit')
+                    #print('MeleUnit created and placed')
+                elif playerID == 1:
+                #elif request.theType == 'rangedUnit':
+                    unit = MapObjectDefinition.RangedUnit(playerID, posX=x, posY=y)
                     self.allUnits[unit.globalID] = unit
                     glob.the_map.placeObject(unit, x, y)
+                    print('Player 1 created a unit')
 
     def executeGameLogic(self):
         #kill all dead unit

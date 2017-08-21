@@ -56,12 +56,14 @@ def getGameConfiguration():
     gameConf['width'] = cfg.getint('map', 'width') #x 
     gameConf['height'] = cfg.getint('map', 'height') #y
     gameConf['squareSize'] = cfg.getint('map', 'squareSize') #y
-    gameConf['playerNum'] = cfg.getint('map', 'playerNum')
-    gameConf['playerID'] = curUser.playerNum
+    gameConf['playerNumber'] = cfg.getint('map', 'playerNumber')
+    gameConf['playerID'] = curUser.playerID
     return jsonify(gameConf)
 
+@flask_login.login_required
 @socketio.on('cell')
 def handle_cell(receivedJson):
+    curUser = flask_login.current_user
     print('received json: ' + str(receivedJson))
     jsondata = receivedJson['data']
     x = jsondata["x"]
@@ -69,7 +71,7 @@ def handle_cell(receivedJson):
 
     import random
     unitType = 'meleUnit' if random.random() > 0.5 else 'rangedUnit'
-    ThePlayerRequest = PlayerRequest('unit', unitType, x, y)
+    ThePlayerRequest = PlayerRequest('unit', unitType, curUser.playerID, x, y)
     #ThePlayerRequest = PlayerRequest('unit', 'ranged#Unit', x, y)
     glob.all_requests.append(ThePlayerRequest)
 
@@ -85,7 +87,7 @@ def test_connect():
 @socketio.on('gameReady')
 def gameReady(receivedJson):
     curUser = flask_login.current_user
-    glob.players[curUser.playerNum].setReady()
+    glob.players[curUser.playerID].setReady()
 
     for player in glob.players:
         if not player.isReady():
@@ -139,14 +141,14 @@ def login():
 @app.route('/protected')
 @flask_login.login_required
 def protected():
-    return 'Logged in as: {}, player number: {}'.format(flask_login.current_user.id, flask_login.current_user.playerNum)
+    return 'Logged in as: {}, player number: {}'.format(flask_login.current_user.id, flask_login.current_user.playerID)
 
 @app.route('/unprotected')
 def unprotected():
     return '<p>not logged in</p>' 
 
 def main():
-    glob.players = [Player(i) for i in range(cfg.getint('map' ,'playerNum'))]
+    glob.players = [Player(i) for i in range(cfg.getint('map' ,'playerNumber'))]
     glob.the_map = MapDefinition.Map()
     glob.actionEventManager = MapDefinition.ActionEventManager()
 

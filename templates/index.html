@@ -112,7 +112,7 @@
         knight: { size: {x:37, y:45}, speed: 1.0*32.0}, 
         canon: { size: {x:39, y:40}, speed: 0.7*32.0}, 
     }
-    var playerNum = 2;
+    var playerNumber = 2;
     var playerID;
     var isGameConfigured = false;
     var allUnits = new Object();
@@ -125,7 +125,7 @@
             map_x = data.width * data.squareSize;
             map_y = data.height * data.squareSize;
             map_squareSize = data.squareSize;
-            playerNum = data.playerNum;
+            playerNumber = data.playerNumber;
             playerID = data.playerID;
 
             game = new Phaser.Game(map_x, map_y, Phaser.AUTO, 'gameDiv', { preload: preload, create: create, update: update, render: render });
@@ -199,7 +199,6 @@
             var Cell = new Object();
             Cell.x = x;
             Cell.y = y;
-            Cell.playerID = playerID;
             socket.emit('cell', {data: Cell});
         }
 

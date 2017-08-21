@@ -16,7 +16,7 @@ class Map:
         self.height = cfg.getint('map', 'height') #y
         self.width = cfg.getint('map', 'width') #x
         self.squareSize = cfg.getint('map', 'squareSize')
-        self.playerNum = cfg.getint('map', 'playerNum')
+        self.playerNumber = cfg.getint('map', 'playerNumber')
         self.playerWidthZone = cfg.getint('map', 'playerWidthZone')
 
         #Create map tiles
@@ -72,12 +72,12 @@ class Map:
 
 
 class MapTile:
-    def __init__(self, x, y, playerNum=2, isPlayerZone=False):
+    def __init__(self, x, y, playerNumber=2, isPlayerZone=False):
         self.x = x
         self.y = y
         self.isPlayerZone = isPlayerZone
         self.tileType = TileType(isPlayerZone)
-        self.isRevealedForPlayer = [ False for x in range(playerNum) ]
+        self.isRevealedForPlayer = [ False for x in range(playerNumber) ]
 
     def __repr__(self):
         return MyEncoder().encode(self.tileType)
